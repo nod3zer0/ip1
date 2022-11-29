@@ -1,8 +1,5 @@
-% Tento soubor nahraďte vlastním souborem s obsahem práce.
-%=========================================================================
-% Autoři: Michal Bidlo, Bohuslav Křena, Jaroslav Dytrych, Petr Veigend a Adam Herout 2019
 \chapter{Úvod}
-
+Tato práce se zabývá principy jednotného přihlášení SSO. Obsahuje základní informace o různých řešeních a dále se blíže zabývá standardem SAML a jeho implementací v podobě Shibbolethu. Tato práce také obsahuje návody jak shibboleth zprovoznit, napojit na různé poskytovatele identity a následně využít při psaní aplikací.
 TODO:
 \chapter{SSO}
 \label{sso}
@@ -19,6 +16,22 @@ Identity provider(idp) se stará o authentizaci uživatele a následné poskytnu
 
 Service provider se stará o authorizaci uživatele ke svým zdrojům na základě informací poskytnutých od service provideru.
 
+\begin{figure}[h]
+	\centering
+    \includegraphics[width=0.8\textwidth]{obrazky-figures/saml-flow.png}
+	\caption{Ukázka přihlášení pomocí SAML\cite{SAMLxOIDC}}
+	\label{saml-flow}
+\end{figure}
+
+
+\section{OIDC}
+
+OIDC (OpenID Connect) je otevřený standard umožňující výměnu autentizačních a autorizačních dat mezi více nezávislými subjekty. Je postavený nad OAuth 2.0 protokolu.\cite{OIDC}
+
+\section{SAML x OIDC}
+
+SAML je starší z těchto dvou protokolů a využívá k přenosu dat XML. OIDC je novější a využívá k přenosu dat JSON. 
+SAML je momentálně rozšířenější i když OIDC nabírá na popularitě díky jednodušší implementaci a používání JSONu ke komunikaci.\cite{SAMLxOIDC}
 
 \section{Shibboleth}
 
@@ -27,7 +40,7 @@ Shibboleth je implementace SAML standardu. Jeho hlavní součástí jsou dvě ap
 \chapter{Návod}
 \label{návod}
 
-Zde je návod jak nainstalovat a nastavit Shibboleth sp, tak aby ho bylo možné propojit s idp podporujícím . Jedná se převážně o aktualizaci tohoto návodu \cite{shibbolethSpInstallation}, v kombinaci s informacemi na oficiální wiki shibbolethu\cite{shibbolethWikiSP}
+Zde je návod jak nainstalovat a nastavit Shibboleth sp, tak aby ho bylo možné propojit s idp podporujícím. Jedná se převážně o aktualizaci tohoto návodu \cite{shibbolethSpInstallation}, v kombinaci s informacemi na oficiální wiki shibbolethu\cite{shibbolethWikiSP}
 
 \section{Instalace sp}
 
@@ -42,7 +55,8 @@ Dále je třeba vygenerovat certifikáty pro apache. Pro jednoduchost se vygener
     sudo a2enmod ssl
     sudo a2ensite default-ssl.conf
     sudo mkdir /etc/apache2/ssl
-    sudo openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /etc/apache2/ssl/apache.key -out /etc/apache2/ssl/apache.crt
+    sudo openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
+    -keyout /etc/apache2/ssl/apache.key -out /etc/apache2/ssl/apache.crt
 \end{lstlisting}
 
 Shibboleth potřebuje vygenerovat certifikát. Localhost je třeba nahradit ipadresou serveru na kterém sp poběží.
@@ -136,15 +150,17 @@ Je potřeba udělat následující kroky
         \item Identifier je třeba nastavit na entityID SP
         \item Reply URL je třeba nastavit na \url{https://vasedomena/Shibboleth.sso/SAML2/POST}
     \end{itemize}
-    \item [Attributes & Claims]
+    \item \mbox{ Attributes \& Claims} \linebreak
     Protože Azure využívá pro NameID SAML indetifier místo SAML atributu, tak je potřeba pro NameID nastavit Name identifier format na Unspecified.
     Dále stačí vybrat jaký atribut se bude používat jak hlavní ID uživatele.
     
     Následně je ještě potřeba v nastavení sp v souboru attribute-map.xml (/etc/shibboleth/attribute-map.xml) přidat následující řadky:
     
     \begin{lstlisting}[language=XML]
-   <Attribute name="urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified" id="NameID">
-        <AttributeDecoder xsi:type="NameIDAttributeDecoder" formatter="$Name" defaultQualifiers="true"/>
+   <Attribute name="urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified"
+   id="NameID">
+        <AttributeDecoder xsi:type="NameIDAttributeDecoder" 
+        formatter="$Name" defaultQualifiers="true"/>
    </Attribute>
 \end{lstlisting}
 ,které řeknou Shibbolethu jak interpretovat NameId. NameID bude uloženo v proměnné NameID.
@@ -167,9 +183,7 @@ Po nastavení se dá aplikace otestovat tlačítkem Test. Aplikace by vás měla
 
 \section{používání v Apache}
 
-Pro využití shibolethu v Apache stačí uvést například do .htaccess co je vyžadováno za oprávnění od uživatele. Více informací o sytaxi jsou na následujících stránkách 
-\url{https://shibboleth.atlassian.net/wiki/spaces/SP3/pages/2065335062/Apache}
-\url{https://shibboleth.atlassian.net/wiki/spaces/SP3/pages/2065335056/htaccess}
+Pro využití shibolethu v Apache stačí uvést například do .htaccess co je vyžadováno za oprávnění od uživatele. Více informací o sytaxi je k nalezení v dokumentaci\cite{SPApache}\cite{SPhtaccess} \linebreak
 
 příklad .htaccess pro přístup uživatele testuser@gmail.com:
 
@@ -184,29 +198,52 @@ ShibRequestSetting requireSession true
 
 
 \section{Discovery service}
-Pro používání více než jednoho idp je potřeba nastavit discovery service. Pro jednoduché řešení stačí statická webová stránka, pro řešení obsahující desítky idp bude lepší využít discovery service od shibbolethu. Zde hodně záleží na aplikaci do které se to bude implementovat. Různé možnosti implementace jsou popsané na následující adrese. 
-\url{https://shibboleth.atlassian.net/wiki/spaces/CONCEPT/pages/928645263/IdPDiscovery}
+Pro používání více než jednoho idp je potřeba nastavit discovery service. Pro jednoduché řešení stačí statická webová stránka, pro řešení obsahující desítky idp bude lepší využít discovery service od shibbolethu. Zde hodně záleží na konkrétní aplikaci. Různé možnosti implementace jsou popsané v dokumentaci \cite{IdPDiscovery}. 
 \chapter{config}
-Popis důležitých částí nastavení shibboleth sp. Bližší informace jsou k nalezení zde: \url{https://shibboleth.atlassian.net/wiki/spaces/SP3/pages/2063695920/Configuration}
+Popis důležitých částí nastavení shibboleth sp. Bližší informace jsou k nalezení na webu\cite{SPconfig}. 
 
 \section{shibboleth2.xml}
-Hlavní config soubor shibbolethu. 
+Hlavní config soubor shibbolethu. Nachází se na cestě /etc/shibboleth/shibboleth2.xml .
 
 \subsection{ApplicationDefaults}
 \begin{lstlisting}[language=xml]
 <ApplicationDefaults entityID="https://vasedomena/shibboleth"
         REMOTE_USER="NameID"
-        cipherSuites="DEFAULT:!EXP:!LOW:!aNULL:!eNULL:!DES:!IDEA:!SEED:!RC4:!3DES:!kRSA:!SSLv2:!SSLv3:!TLSv1:!TLSv1.1">
+        cipherSuites="DEFAULT:!EXP:!LOW:!aNULL:!eNULL:!DES:!IDEA:
+        !SEED:!RC4:!3DES:!kRSA:!SSLv2:!SSLv3:!TLSv1:!TLSv1.1">
 \end{lstlisting}
 \begin{itemize}
-    \item[entityID]
+    \item entityID \linebreak
     Název SP. Musí být unikátní v rámci federace identit. Je zvykem využít doménu sp.  
-    \item[REMOTE\_USER] 
+    \item REMOTE\_USER \linebreak
     Zde patří názvy atributů, kterými se budou od sebe odlišovat různí uživatelé. 
-    Tento atribut bude následně k dispozici z proměnné REMOTE_USER.
+    Tento atribut bude následně k dispozici z proměnné REMOTE\_USER.
 \end{itemize}
 \subsection{MetadataProvider}
-\section{attribute-map.xml }
+Definuje kde se nachází metadata idp. Pro většinu aplikací by mělo stačit jedno z následujících nastavení. Více informací lze nalézt na webových stránkách\cite{MetadataProvider}.
+\linebreak \linebreak
+Metadata se nahrávají z url.
+\begin{lstlisting}[language=Bash]
+ <MetadataProvider type="XML" validate="true"
+                url="https://samltest.id/saml/idp"/>
+\end{lstlisting}
+Metadata se nahrávají ze souboru.
+\begin{lstlisting}[language=Bash]
+ <MetadataProvider type="XML" path="/path/to/the/metadata.xml"/>
+\end{lstlisting}
+
+
+\section{attribute-map.xml}
+Obsahuje informace o mapování atributů přijatých od idp na proměnné sp. Soubor obsahuje nějaké základní mapování, ale pro většinu aplikací bude nutné tento soubor upravit.
+
+Následuje příklad přidání jednoduchého atributu, kde jméno atributu přijatého od idp je FavoriteFruit a favFruit je jméno používané v proměnných sp\cite{AddAttribute}.
+ \begin{lstlisting}[language=XML]
+     <Attribute name="FavoriteFruit"
+    nameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:basic"
+    id="favFruit" />
+    \end{lstlisting}
+    
+Toto nastavení by mělo být dostačující pro většinu aplikací. Více informací lze nalézt na webových stránkách\cite{AddAttribute}.
 
 \chapter{Závěr}
 TODO:
