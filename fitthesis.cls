@@ -225,10 +225,10 @@
 %Vyber typu projektu / project type selection
 \newcommand{\set@project}[1]{%
  \naselfalse
- \ifEqString{#1}{BP}{Bakalářská práce}{\@projecttype@CS}%
+ \ifEqString{#1}{BP}{Technická zpráva}{\@projecttype@CS}%
 % \ifEqString{#1}{BP}{Bakalárska práca}{\@projecttype@SK}%
- \ifEqString{#1}{BP}{Bakalářská práce}{\@projecttype@SK}%
- \ifEqString{#1}{BP}{Bachelor's thesis}{\@projecttype@EN}%
+ \ifEqString{#1}{BP}{Technická zpráva}{\@projecttype@SK}%
+ \ifEqString{#1}{BP}{Technical report}{\@projecttype@EN}%
  \ifEqString{#1}{BP}{Vedoucí práce}{\@supervisor@CS}%
 % \ifEqString{#1}{BP}{Vedúci práce}{\@supervisor@SK}%
  \ifEqString{#1}{BP}{Vedoucí práce}{\@supervisor@SK}%

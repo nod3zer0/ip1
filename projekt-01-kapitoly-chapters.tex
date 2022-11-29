@@ -16,12 +16,7 @@ Identity provider(idp) se stará o authentizaci uživatele a následné poskytnu
 
 Service provider se stará o authorizaci uživatele ke svým zdrojům na základě informací poskytnutých od service provideru.
 
-\begin{figure}[h]
-	\centering
-    \includegraphics[width=0.8\textwidth]{obrazky-figures/saml-flow.png}
-	\caption{Ukázka přihlášení pomocí SAML\cite{SAMLxOIDC}}
-	\label{saml-flow}
-\end{figure}
+
 
 
 \section{OIDC}
@@ -32,6 +27,7 @@ OIDC (OpenID Connect) je otevřený standard umožňující výměnu autentizač
 
 SAML je starší z těchto dvou protokolů a využívá k přenosu dat XML. OIDC je novější a využívá k přenosu dat JSON. 
 SAML je momentálně rozšířenější i když OIDC nabírá na popularitě díky jednodušší implementaci a používání JSONu ke komunikaci.\cite{SAMLxOIDC}
+Princip přihlašování je až na různé názvosloví podobný.
 
 \section{Shibboleth}
 
@@ -43,10 +39,32 @@ Identity provider se stará o autentizaci uživatelů. Identity provider po aute
 
 \subsection{service provider}
 
-Service provider se stará o authorizaci přístupu k různým službám, které poskytuje. 
+Service provider se stará o autorizaci přístupu k různým službám, které poskytuje, na základě informací poskytnutých od identity provideru.
 
-\subsection{}
+\subsection{postup přihlášení přes idp}
 
+Rozlišují se dvě možnosti přihlášení. Přihlášení vyvolané na straně identity provideru a přihlášení vyvolané na straně service provideru.
+
+\linebreak
+Pokud bylo přihlášení vyvolané na straně service provideru, tak je uživatel přesměrován na idp, kde bude identity providerem vyzván k autentizaci.
+Po úspěšné autentizaci identity provider předá informaci o úspěšné autentizaci společně s různými atributy, na kterých se předem domluvily, service provideru společně s přesměrováním uživatele na původní stránku.
+Tyto informace service provider využije k autorizaci různých svých částí.\cite{SAMLxOIDC}
+\begin{figure}[bp]
+	\centering
+    \includegraphics[width=0.8\textwidth]{obrazky-figures/saml-sp.png}
+	\caption{Ukázka přihlášení vyvolané sp\cite{SAMLxOIDC}}
+	\label{saml-flow}
+\end{figure}
+
+Pokud bylo přihlášení vyvolané na straně identity provideru, tak je uživatel rovnou přesměrován na service provideru s informaci o úspěšné autentizaci společně s různými atributy, na kterých se předem domluvily.
+Tyto informace service provider využije k autorizaci různých svých částí.\cite{SAMLxOIDC}
+
+\begin{figure}[bp]
+	\centering
+    \includegraphics[width=0.8\textwidth]{obrazky-figures/saml-idp.png}
+	\caption{Ukázka přihlášení vyvolané idp\cite{SAMLxOIDC}}
+	\label{saml-flow}
+\end{figure}
 \chapter{Návod}
 \label{návod}
 
