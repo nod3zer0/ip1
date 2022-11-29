@@ -1,0 +1,220 @@
+% Tento soubor nahraďte vlastním souborem s obsahem práce.
+%=========================================================================
+% Autoři: Michal Bidlo, Bohuslav Křena, Jaroslav Dytrych, Petr Veigend a Adam Herout 2019
+\chapter{Úvod}
+
+TODO:
+\chapter{SSO}
+\label{sso}
+SSO (Single Sign-On) je mechanizmus pro jednotné přihlášení. Umožňuje uživateli se přihlásit na jednom místě a následně využívat toto přihlášení pro přístup k více nezávislým aplikacím. \cite{SSO}
+
+
+\section{SAML}
+
+SAML\cite{SAMLofficialSite}\cite{WhatIsSaml} (Security Assertion Markup Language) je otevřený standard umožňující výměnu autentizačních a autorizačních dat mezi více nezávislými subjekty. Využívá k tomu protokol XML. 
+
+SAML definuje tři role. Uživatel, identity provider (zkráceně idp) a service provider (zkráceně sp). 
+
+Identity provider(idp) se stará o authentizaci uživatele a následné poskytnutí dat service provideru(sp).
+
+Service provider se stará o authorizaci uživatele ke svým zdrojům na základě informací poskytnutých od service provideru.
+
+
+\section{Shibboleth}
+
+Shibboleth je implementace SAML standardu. Jeho hlavní součástí jsou dvě aplikace. Identity provider, který se stará o authentifikaci. Service provider, který se stará o authorizaci po úspěšném přihlášení přes identity providera. \cite{shibbolethWiki}
+
+\chapter{Návod}
+\label{návod}
+
+Zde je návod jak nainstalovat a nastavit Shibboleth sp, tak aby ho bylo možné propojit s idp podporujícím . Jedná se převážně o aktualizaci tohoto návodu \cite{shibbolethSpInstallation}, v kombinaci s informacemi na oficiální wiki shibbolethu\cite{shibbolethWikiSP}
+
+\section{Instalace sp}
+
+Nejdříve je třeba nainstalovat web server. Tento návod využívá Apache2
+\begin{lstlisting}[language=Bash]
+    sudo apt-get update
+    sudo apt-get install apache2
+\end{lstlisting}
+
+Dále je třeba vygenerovat certifikáty pro apache. Pro jednoduchost se vygenerují self-signed.
+\begin{lstlisting}[language=Bash]
+    sudo a2enmod ssl
+    sudo a2ensite default-ssl.conf
+    sudo mkdir /etc/apache2/ssl
+    sudo openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /etc/apache2/ssl/apache.key -out /etc/apache2/ssl/apache.crt
+\end{lstlisting}
+
+Shibboleth potřebuje vygenerovat certifikát. Localhost je třeba nahradit ipadresou serveru na kterém sp poběží.
+\begin{lstlisting}[language=Bash]
+    sudo shib-keygen -h localhost
+    openssl x509 -text -noout -in /etc/shibboleth/sp-cert.pem
+\end{lstlisting}
+
+Nastavení shibolethu se nachází /etc/shibboleth/shibboleth2.xml .
+
+\begin{lstlisting}[language=Bash]
+   sudo vim /etc/shibboleth/shibboleth2.xml
+\end{lstlisting}
+
+Zde je potřeba nastavit následující hodnoty. V <ApplicationDefaults> je potřeba nastavit entityID. EntityID by mělo být jedinečné. Většinou se používá doména aplikace ke které se bude přistupovat přes shibboleth. Například: http://vasedomena/shibboleth . Není to ale nutné pro fungování shibbolethu.
+
+Pro povolení SSL, je třeba nastavit v <Sessions>  handlerSSL na true a cookieProps na https.
+
+Pod <SSO> se přidá EntityID idp, který se bude používat.
+
+Na konec souboru se přidá kde se budou brát metadata od idp.
+\begin{lstlisting}[language=Bash]
+ <MetadataProvider type="XML" validate="true"
+                url="https://samltest.id/saml/idp"/>
+\end{lstlisting}
+
+pro jednoduchost se použije jeden klíč pro podpis i pro šifrování.
+
+Toho se docílí změnou těchto řádků:
+\begin{lstlisting}[language=Bash]
+<CredentialResolver type="File" use="signing"
+            key="sp-signing-key.pem" certificate="sp-cert.pem"/>
+        <CredentialResolver type="File" use="encryption"
+            key="sp-encrypt-key.pem" certificate="sp-cert.pem"/>
+\end{lstlisting}
+
+na tyto:
+\begin{lstlisting}[language=Bash]
+<CredentialResolver type="File"
+            key="sp-key.pem" certificate="sp-cert.pem"/>
+\end{lstlisting}
+
+následně je třeba restartovat shibboleth
+\begin{lstlisting}[language=Bash]
+sudo service shibd restart
+\end{lstlisting}
+
+Pokud vše funguje, tak na následující adrese by mělo být vidět text: "A valid session was not found."
+\begin{lstlisting}[language=Bash]
+https://vasedomena/Shibboleth.sso/Session
+\end{lstlisting}
+
+\section{Propojení s idp}
+
+Zde je uvedeno pár návodů pro propojení sp s různými idp.
+
+\subsection{SAML test}
+SAML test je testovací stránka pro debugování SAML aplikací. Většina idp bude mít stejný postup propojení jako SAML test.
+
+
+
+Na tuto stránku je třeba nahrát metadata z sp 
+\url{https://samltest.id/upload.php}  . Tyto metadata se dají získat na následující cestě na doméně kde je hostován SP \url{https://vasedomena/Shibboleth.sso/Session }
+
+dále je potřeba v nastavení shibbolethu (/etc/shibboleth/shibboleth2.xml) přidat následující řádky, které řeknou odkud si má shibboleth vzít metadata idp.
+\begin{lstlisting}[language=Bash]
+ <MetadataProvider type="XML"
+                url="https://samltest.id/saml/idp"/>
+\end{lstlisting}
+
+Následně když se zajde na tuto stránku \url{https://samltest.id/start-sp-test/}, tak po vyplnění entityID se dá přihlásit do SP, přes samltest idp.
+
+Po přihlášení by mělo být vidět na následující cestě na doméně kde je hostován SP informace o aktivním sessionu \url{http://vasedomena/Shibboleth.sso/Session} 
+
+
+
+\subsection{Azure}
+
+Tato sekce je inspirována tímto návodem\cite{AzureTutorial}
+
+
+Je potřeba udělat následující kroky
+\begin{itemize}
+    \item v azure portalu u azure services je třeva kliknout na Azure Active Directory
+    \item pod manage otevřít Enterprise applications
+    \item kliknout na New application
+    \item tlačítkem Create potvrdit vytvoření aplikace
+    \item v aplikaci pod záložkou Single sign-on se vybere SAML a dále jsou potřeba nastavit následující
+    \item Basic SAML Configuration
+    \begin{itemize}
+        \item Identifier je třeba nastavit na entityID SP
+        \item Reply URL je třeba nastavit na \url{https://vasedomena/Shibboleth.sso/SAML2/POST}
+    \end{itemize}
+    \item [Attributes & Claims]
+    Protože Azure využívá pro NameID SAML indetifier místo SAML atributu, tak je potřeba pro NameID nastavit Name identifier format na Unspecified.
+    Dále stačí vybrat jaký atribut se bude používat jak hlavní ID uživatele.
+    
+    Následně je ještě potřeba v nastavení sp v souboru attribute-map.xml (/etc/shibboleth/attribute-map.xml) přidat následující řadky:
+    
+    \begin{lstlisting}[language=XML]
+   <Attribute name="urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified" id="NameID">
+        <AttributeDecoder xsi:type="NameIDAttributeDecoder" formatter="$Name" defaultQualifiers="true"/>
+   </Attribute>
+\end{lstlisting}
+,které řeknou Shibbolethu jak interpretovat NameId. NameID bude uloženo v proměnné NameID.
+
+Jakékoli další atributy, které je potřeba předávat na sp, se dají nastavit na této stránce podobným způsobem. Name format se nechá na Omitted, jinak zbytek nastavení je dle potřeb aplikace. Následně je potřeba do attribute-map.xml přidat informaci jak se mají tyto atributy zpracovat.
+   \begin{lstlisting}[language=XML]
+     <Attribute name="Namespace/Name"
+    nameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:unspecified"
+    id="role1" />
+    \end{lstlisting}
+,kde Namespace se nahradí za namespace atributu.Name se také nahradí za název atributu. Pokud bylo potřeba měnit Name Format, tak je ho potřeba změnit i zde.
+    
+
+
+    \item Dále je třeba nahrát pomocí tlačítka v levo nahoře "Upload metadata file" metadata SP. Tyto metadata najdete na této cestě u vašho SP \url{http://vasedomena/Shibboleth.sso/Metadata}
+
+\end{itemize}
+
+Po nastavení se dá aplikace otestovat tlačítkem Test. Aplikace by vás měla přesměrovat na doménu vaší aplikace a následně na následující adrese \url{https://vasedomena/Shibboleth.sso/Session} by měla být vidět aktivní session a názvy attributů, které idp předal sp.
+
+\section{používání v Apache}
+
+Pro využití shibolethu v Apache stačí uvést například do .htaccess co je vyžadováno za oprávnění od uživatele. Více informací o sytaxi jsou na následujících stránkách 
+\url{https://shibboleth.atlassian.net/wiki/spaces/SP3/pages/2065335062/Apache}
+\url{https://shibboleth.atlassian.net/wiki/spaces/SP3/pages/2065335056/htaccess}
+
+příklad .htaccess pro přístup uživatele testuser@gmail.com:
+
+ \begin{lstlisting}
+    AuthType shibboleth
+ShibRequestSetting requireSession true
+<RequireAll>
+  require shibboleth
+  require shib-user testuser@gmail.com
+</RequireAll>
+    \end{lstlisting}
+
+
+\section{Discovery service}
+Pro používání více než jednoho idp je potřeba nastavit discovery service. Pro jednoduché řešení stačí statická webová stránka, pro řešení obsahující desítky idp bude lepší využít discovery service od shibbolethu. Zde hodně záleží na aplikaci do které se to bude implementovat. Různé možnosti implementace jsou popsané na následující adrese. 
+\url{https://shibboleth.atlassian.net/wiki/spaces/CONCEPT/pages/928645263/IdPDiscovery}
+\chapter{config}
+Popis důležitých částí nastavení shibboleth sp. Bližší informace jsou k nalezení zde: \url{https://shibboleth.atlassian.net/wiki/spaces/SP3/pages/2063695920/Configuration}
+
+\section{shibboleth2.xml}
+Hlavní config soubor shibbolethu. 
+
+\subsection{ApplicationDefaults}
+\begin{lstlisting}[language=xml]
+<ApplicationDefaults entityID="https://vasedomena/shibboleth"
+        REMOTE_USER="NameID"
+        cipherSuites="DEFAULT:!EXP:!LOW:!aNULL:!eNULL:!DES:!IDEA:!SEED:!RC4:!3DES:!kRSA:!SSLv2:!SSLv3:!TLSv1:!TLSv1.1">
+\end{lstlisting}
+\begin{itemize}
+    \item[entityID]
+    Název SP. Musí být unikátní v rámci federace identit. Je zvykem využít doménu sp.  
+    \item[REMOTE\_USER] 
+    Zde patří názvy atributů, kterými se budou od sebe odlišovat různí uživatelé. 
+    Tento atribut bude následně k dispozici z proměnné REMOTE_USER.
+\end{itemize}
+\subsection{MetadataProvider}
+\section{attribute-map.xml }
+
+\chapter{Závěr}
+TODO:
+\label{zaver}
+
+
+
+
+
+
+%===============================================================================
