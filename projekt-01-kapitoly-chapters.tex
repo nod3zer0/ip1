@@ -12,26 +12,26 @@ SAML\cite{SAMLofficialSite}\cite{WhatIsSaml} (Security Assertion Markup Language
 
 SAML definuje tři role. Uživatel, identity provider (zkráceně idp) a service provider (zkráceně sp). 
 
-Identity provider(idp) se stará o authentizaci uživatele a následné poskytnutí dat service provideru(sp).
+Identity provider(idp) se stará o autentizaci uživatele a následné poskytnutí dat service provideru(sp).
 
-Service provider se stará o authorizaci uživatele ke svým zdrojům na základě informací poskytnutých od service provideru.
+Service provider se stará o autorizaci uživatele ke svým zdrojům na základě informací poskytnutých od service provideru.
 
 
 
 
 \section{OIDC}
 
-OIDC (OpenID Connect) je otevřený standard umožňující výměnu autentizačních a autorizačních dat mezi více nezávislými subjekty. Je postavený nad OAuth 2.0 protokolu.\cite{OIDC}
+OIDC (OpenID Connect) je otevřený standard umožňující výměnu autentizačních a autorizačních dat mezi více nezávislými subjekty. Je postavený nad protokolem OAuth 2.0.\cite{OIDC}
 
 \section{SAML x OIDC}
 
 SAML je starší z těchto dvou protokolů a využívá k přenosu dat XML. OIDC je novější a využívá k přenosu dat JSON. 
-SAML je momentálně rozšířenější i když OIDC nabírá na popularitě díky jednodušší implementaci a používání JSONu ke komunikaci.\cite{SAMLxOIDC}
+SAML je momentálně rozšířenější i když OIDC nabírá na popularitě díky jednodušší implementaci a použítí JSONu ke komunikaci.\cite{SAMLxOIDC}
 Princip přihlašování je až na různé názvosloví podobný.
 
 \section{Shibboleth}
 
-Shibboleth je implementace SAML standardu. Jeho hlavní součástí jsou dvě aplikace. Identity provider, který se stará o authentifikaci. Service provider, který se stará o authorizaci po úspěšném přihlášení přes identity providera. \cite{shibbolethWiki}
+Shibboleth je implementace SAML standardu. Jeho hlavní součástí jsou dvě aplikace. Identity provider, který se stará o autentizaci. Service provider, který se stará o autorizaci po úspěšném přihlášení přes identity providera. \cite{shibbolethWiki}
 
 \subsection{identity provider}
 
@@ -41,17 +41,17 @@ Identity provider se stará o autentizaci uživatelů. Identity provider po aute
 
 Service provider se stará o autorizaci přístupu k různým službám, které poskytuje, na základě informací poskytnutých od identity provideru.
 
-\subsection{postup přihlášení přes idp}
+\subsection{postup přihlášení za pomocí idp}
 
 Rozlišují se dvě možnosti přihlášení. Přihlášení vyvolané na straně identity provideru a přihlášení vyvolané na straně service provideru.
 
-\linebreak
+
 Pokud bylo přihlášení vyvolané na straně service provideru, tak je uživatel přesměrován na idp, kde bude identity providerem vyzván k autentizaci.
 Po úspěšné autentizaci identity provider předá informaci o úspěšné autentizaci společně s různými atributy, na kterých se předem domluvily, service provideru společně s přesměrováním uživatele na původní stránku.
 Tyto informace service provider využije k autorizaci různých svých částí.\cite{SAMLxOIDC}
 \begin{figure}[bp]
 	\centering
-    \includegraphics[width=0.8\textwidth]{obrazky-figures/saml-sp.png}
+    \includegraphics[width=1\textwidth]{obrazky-figures/saml-sp.png}
 	\caption{Ukázka přihlášení vyvolané sp\cite{SAMLxOIDC}}
 	\label{saml-flow}
 \end{figure}
@@ -61,14 +61,14 @@ Tyto informace service provider využije k autorizaci různých svých částí.
 
 \begin{figure}[bp]
 	\centering
-    \includegraphics[width=0.8\textwidth]{obrazky-figures/saml-idp.png}
+    \includegraphics[width=1\textwidth]{obrazky-figures/saml-idp.png}
 	\caption{Ukázka přihlášení vyvolané idp\cite{SAMLxOIDC}}
 	\label{saml-flow}
 \end{figure}
 \chapter{Návod}
 \label{návod}
 
-Zde je návod jak nainstalovat a nastavit Shibboleth sp, tak aby ho bylo možné propojit s idp podporujícím. Jedná se převážně o aktualizaci tohoto návodu \cite{shibbolethSpInstallation}, v kombinaci s informacemi na oficiální wiki shibbolethu\cite{shibbolethWikiSP}
+Zde je návod jak nainstalovat a nastavit Shibboleth sp, tak aby ho bylo možné propojit s idp. Jedná se převážně o aktualizaci tohoto návodu\cite{shibbolethSpInstallation}, v kombinaci s informacemi na oficiální wiki shibbolethu\cite{shibbolethWikiSP}
 
 \section{Instalace sp}
 
@@ -78,7 +78,7 @@ Nejdříve je třeba nainstalovat web server. Tento návod využívá Apache2
     sudo apt-get install apache2
 \end{lstlisting}
 
-Dále je třeba vygenerovat certifikáty pro apache. Pro jednoduchost se vygenerují self-signed.
+Dále je třeba vygenerovat certifikáty pro Apache2. Pro jednoduchost se vygenerují self-signed certifikáty.
 \begin{lstlisting}[language=Bash]
     sudo a2enmod ssl
     sudo a2ensite default-ssl.conf
@@ -87,7 +87,7 @@ Dále je třeba vygenerovat certifikáty pro apache. Pro jednoduchost se vygener
     -keyout /etc/apache2/ssl/apache.key -out /etc/apache2/ssl/apache.crt
 \end{lstlisting}
 
-Shibboleth potřebuje vygenerovat certifikát. Localhost je třeba nahradit ipadresou serveru na kterém sp poběží.
+Shibboleth potřebuje vygenerovat certifikát ke komunikaci s idp. Localhost je třeba nahradit ipadresou serveru na kterém sp poběží.
 \begin{lstlisting}[language=Bash]
     sudo shib-keygen -h localhost
     openssl x509 -text -noout -in /etc/shibboleth/sp-cert.pem
@@ -99,13 +99,13 @@ Nastavení shibolethu se nachází /etc/shibboleth/shibboleth2.xml .
    sudo vim /etc/shibboleth/shibboleth2.xml
 \end{lstlisting}
 
-Zde je potřeba nastavit následující hodnoty. V <ApplicationDefaults> je potřeba nastavit entityID. EntityID by mělo být jedinečné. Většinou se používá doména aplikace ke které se bude přistupovat přes shibboleth. Například: http://vasedomena/shibboleth . Není to ale nutné pro fungování shibbolethu.
+Zde je potřeba nastavit následující hodnoty. V <ApplicationDefaults> je potřeba nastavit entityID. EntityID by mělo být jedinečné. Většinou se používá doména aplikace ke které se bude přistupovat přes Shibboleth. Například: http://vasedomena/shibboleth . Není to ale nutné pro fungování Shibbolethu.
 
 Pro povolení SSL, je třeba nastavit v <Sessions>  handlerSSL na true a cookieProps na https.
 
 Pod <SSO> se přidá EntityID idp, který se bude používat.
 
-Na konec souboru se přidá kde se budou brát metadata od idp.
+Na konec souboru se přidá informace kde se nachází metadata idp.
 \begin{lstlisting}[language=Bash]
  <MetadataProvider type="XML" validate="true"
                 url="https://samltest.id/saml/idp"/>
@@ -132,7 +132,7 @@ následně je třeba restartovat shibboleth
 sudo service shibd restart
 \end{lstlisting}
 
-Pokud vše funguje, tak na následující adrese by mělo být vidět text: "A valid session was not found."
+Pokud vše funguje, tak na následující adrese by měl být vidět text: "A valid session was not found."
 \begin{lstlisting}[language=Bash]
 https://vasedomena/Shibboleth.sso/Session
 \end{lstlisting}
@@ -149,7 +149,7 @@ SAML test je testovací stránka pro debugování SAML aplikací. Většina idp 
 Na tuto stránku je třeba nahrát metadata z sp 
 \url{https://samltest.id/upload.php}  . Tyto metadata se dají získat na následující cestě na doméně kde je hostován SP \url{https://vasedomena/Shibboleth.sso/Session }
 
-dále je potřeba v nastavení shibbolethu (/etc/shibboleth/shibboleth2.xml) přidat následující řádky, které řeknou odkud si má shibboleth vzít metadata idp.
+dále je potřeba v nastavení shibbolethu (/etc/shibboleth/shibboleth2.xml) přidat cestu k metadatům idp.
 \begin{lstlisting}[language=Bash]
  <MetadataProvider type="XML"
                 url="https://samltest.id/saml/idp"/>
@@ -166,23 +166,24 @@ Po přihlášení by mělo být vidět na následující cestě na doméně kde 
 Tato sekce je inspirována tímto návodem\cite{AzureTutorial}
 
 
-Je potřeba udělat následující kroky
+Pro propojení s Azure IDP je potřeba udělat následující kroky
 \begin{itemize}
-    \item v azure portalu u azure services je třeva kliknout na Azure Active Directory
-    \item pod manage otevřít Enterprise applications
+    \item v Azure portalu u Azure services je třeba kliknout na Azure Active Directory
+    \item vlevo ve sloupci pod manage otevřít Enterprise applications
     \item kliknout na New application
+    \item kliknout na Create your own application
     \item tlačítkem Create potvrdit vytvoření aplikace
-    \item v aplikaci pod záložkou Single sign-on se vybere SAML a dále jsou potřeba nastavit následující
+    \item v aplikaci vlevo pod položkou Single sign-on se vybere SAML a dále jsou potřeba nastavit následující
     \item Basic SAML Configuration
     \begin{itemize}
         \item Identifier je třeba nastavit na entityID SP
         \item Reply URL je třeba nastavit na \url{https://vasedomena/Shibboleth.sso/SAML2/POST}
     \end{itemize}
     \item \mbox{ Attributes \& Claims} \linebreak
-    Protože Azure využívá pro NameID SAML indetifier místo SAML atributu, tak je potřeba pro NameID nastavit Name identifier format na Unspecified.
-    Dále stačí vybrat jaký atribut se bude používat jak hlavní ID uživatele.
+    Protože Azure využívá pro NameID SAML identifier místo SAML atributu, tak je potřeba pro NameID nastavit Name identifier format na Unspecified.
+    Dále stačí vybrat, jaký atribut se bude používat pro identifikaci uživatele.
     
-    Následně je ještě potřeba v nastavení sp v souboru attribute-map.xml (/etc/shibboleth/attribute-map.xml) přidat následující řadky:
+    Následně je ještě potřeba v nastavení SP v souboru attribute-map.xml (/etc/shibboleth/attribute-map.xml) přidat následující řadky:
     
     \begin{lstlisting}[language=XML]
    <Attribute name="urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified"
@@ -191,31 +192,31 @@ Je potřeba udělat následující kroky
         formatter="$Name" defaultQualifiers="true"/>
    </Attribute>
 \end{lstlisting}
-,které řeknou Shibbolethu jak interpretovat NameId. NameID bude uloženo v proměnné NameID.
+které řeknou Shibboleth jak interpretovat NameID. NameID bude uloženo v proměnné NameID.
 
-Jakékoli další atributy, které je potřeba předávat na sp, se dají nastavit na této stránce podobným způsobem. Name format se nechá na Omitted, jinak zbytek nastavení je dle potřeb aplikace. Následně je potřeba do attribute-map.xml přidat informaci jak se mají tyto atributy zpracovat.
+Jakékoli další atributy, které je potřeba předávat SP, se dají nastavit na této stránce podobným způsobem. Name format se nechá na Omitted, jinak zbytek nastavení je dle potřeb aplikace. Následně je potřeba do attribute-map.xml přidat informaci jak se mají jednotlivé atributy zpracovat.
    \begin{lstlisting}[language=XML]
      <Attribute name="Namespace/Name"
     nameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:unspecified"
     id="role1" />
     \end{lstlisting}
-,kde Namespace se nahradí za namespace atributu.Name se také nahradí za název atributu. Pokud bylo potřeba měnit Name Format, tak je ho potřeba změnit i zde.
+Namespace se nahradí za namespace atributu. Name se nahradí za název atributu. Pokud bylo potřeba měnit Name Format, tak je ho potřeba změnit i zde.\cite{AddAttribute}
     
 
 
-    \item Dále je třeba nahrát pomocí tlačítka v levo nahoře "Upload metadata file" metadata SP. Tyto metadata najdete na této cestě u vašho SP \url{http://vasedomena/Shibboleth.sso/Metadata}
+    \item Dále je třeba nahrát pomocí tlačítka vlevo nahoře "Upload metadata file" metadata SP. Tyto metadata najdete na této cestě u vašeho SP \url{http://vasedomena/Shibboleth.sso/Metadata}
 
 \end{itemize}
 
-Po nastavení se dá aplikace otestovat tlačítkem Test. Aplikace by vás měla přesměrovat na doménu vaší aplikace a následně na následující adrese \url{https://vasedomena/Shibboleth.sso/Session} by měla být vidět aktivní session a názvy attributů, které idp předal sp.
+Po nastavení se dá aplikace otestovat tlačítkem Test. Aplikace by vás měla přesměrovat na doménu vaší aplikace a následně na následující adrese \url{https://vasedomena/Shibboleth.sso/Session} by měla být vidět aktivní session a názvy atributů, které IDP předal SP.
 
 \section{používání v Apache}
 
-Pro využití shibolethu v Apache stačí uvést například do .htaccess co je vyžadováno za oprávnění od uživatele. Více informací o sytaxi je k nalezení v dokumentaci\cite{SPApache}\cite{SPhtaccess} \linebreak
+Pro využití shibolethu v Apache stačí uvést do .htaccess co je vyžadováno za oprávnění od uživatele. Více informací o sytaxi je k nalezení v dokumentaci\cite{SPApache}\cite{SPhtaccess} \linebreak
 
 příklad .htaccess pro přístup uživatele testuser@gmail.com:
 
- \begin{lstlisting}
+ \begin{lstlisting}[language=XML]
     AuthType shibboleth
 ShibRequestSetting requireSession true
 <RequireAll>
@@ -226,9 +227,9 @@ ShibRequestSetting requireSession true
 
 
 \section{Discovery service}
-Pro používání více než jednoho idp je potřeba nastavit discovery service. Pro jednoduché řešení stačí statická webová stránka, pro řešení obsahující desítky idp bude lepší využít discovery service od shibbolethu. Zde hodně záleží na konkrétní aplikaci. Různé možnosti implementace jsou popsané v dokumentaci \cite{IdPDiscovery}. 
+Pro používání více než jednoho idp je potřeba nastavit discovery service, kde si může uživatel vybrat kterého chce použít identity providera. Pro jednoduché řešení stačí statická webová stránka s přesměrováními na různé identity providery, pro řešení obsahující desítky idp je lepší využít discovery service od Shibbolethu. Zde hodně záleží na konkrétní aplikaci. Různé možnosti implementace jsou popsané v dokumentaci \cite{IdPDiscovery}. 
 \chapter{config}
-Popis důležitých částí nastavení shibboleth sp. Bližší informace jsou k nalezení na webu\cite{SPconfig}. 
+Popis důležitých částí nastavení, které jsou nutné k správnému fungování shibboleth sp. Detailní informace jsou k nalezení na webu\cite{SPconfig}. 
 
 \section{shibboleth2.xml}
 Hlavní config soubor shibbolethu. Nachází se na cestě /etc/shibboleth/shibboleth2.xml .
@@ -248,7 +249,7 @@ Hlavní config soubor shibbolethu. Nachází se na cestě /etc/shibboleth/shibbo
     Tento atribut bude následně k dispozici z proměnné REMOTE\_USER.
 \end{itemize}
 \subsection{MetadataProvider}
-Definuje kde se nachází metadata idp. Pro většinu aplikací by mělo stačit jedno z následujících nastavení. Více informací lze nalézt na webových stránkách\cite{MetadataProvider}.
+Definuje kde se nachází metadata identity provideru. Pro většinu aplikací by mělo stačit jedno z následujících nastavení. Více informací lze nalézt na webových stránkách\cite{MetadataProvider}.
 \linebreak \linebreak
 Metadata se nahrávají z url.
 \begin{lstlisting}[language=Bash]
@@ -262,7 +263,7 @@ Metadata se nahrávají ze souboru.
 
 
 \section{attribute-map.xml}
-Obsahuje informace o mapování atributů přijatých od idp na proměnné sp. Soubor obsahuje nějaké základní mapování, ale pro většinu aplikací bude nutné tento soubor upravit.
+Obsahuje informace o mapování atributů přijatých od identity provideru na proměnné service provideru. Soubor obsahuje nějaké základní mapování, ale pro většinu aplikací bude nutné tento soubor upravit.
 
 Následuje příklad přidání jednoduchého atributu, kde jméno atributu přijatého od idp je FavoriteFruit a favFruit je jméno používané v proměnných sp\cite{AddAttribute}.
  \begin{lstlisting}[language=XML]
