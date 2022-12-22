@@ -1,10 +1,15 @@
 \chapter{Úvod}
 Tato práce se zabývá principy jednotného přihlášení SSO. Obsahuje základní informace o různých řešeních a dále se blíže zabývá standardem SAML a jeho implementací v podobě Shibbolethu. Tato práce také obsahuje návody jak shibboleth zprovoznit, napojit na různé poskytovatele identity a následně využít při psaní aplikací.
 TODO:
+\section{terminologie}
+\subsection{autentizace}
+proces ověření identity subjektu. Většinou následuje autorizace.\cite{Authorization}
+\subsection{autorizace}
+proces pro specifikování přístupových práv ke zdrojům.\cite{Autentizace}
+
 \chapter{SSO}
 \label{sso}
 SSO (Single Sign-On) je mechanizmus pro jednotné přihlášení. Umožňuje uživateli se přihlásit na jednom místě a následně využívat toto přihlášení pro přístup k více nezávislým aplikacím. \cite{SSO}
-
 
 \section{SAML}
 
@@ -16,12 +21,15 @@ Identity provider(idp) se stará o autentizaci uživatele a následné poskytnut
 
 Service provider se stará o autorizaci uživatele ke svým zdrojům na základě informací poskytnutých od service provideru.
 
+\subsection{autentizace}
 
 
 
 \section{OIDC}
 
 OIDC (OpenID Connect) je otevřený standard umožňující výměnu autentizačních a autorizačních dat mezi více nezávislými subjekty. Je postavený nad protokolem OAuth 2.0.\cite{OIDC}
+
+\subsection{authentifikace}
 
 \section{SAML x OIDC}
 
@@ -51,7 +59,7 @@ Po úspěšné autentizaci identity provider předá informaci o úspěšné aut
 Tyto informace service provider využije k autorizaci různých svých částí.\cite{SAMLxOIDC}
 \begin{figure}[bp]
 	\centering
-    \includegraphics[width=1\textwidth]{obrazky-figures/saml-sp.png}
+    \includegraphics[width=1.2\textwidth]{obrazky-figures/saml-sp.png}
 	\caption{Ukázka přihlášení vyvolané sp\cite{SAMLxOIDC}}
 	\label{saml-flow}
 \end{figure}
@@ -61,7 +69,7 @@ Tyto informace service provider využije k autorizaci různých svých částí.
 
 \begin{figure}[bp]
 	\centering
-    \includegraphics[width=1\textwidth]{obrazky-figures/saml-idp.png}
+    \includegraphics[width=1.2\textwidth]{obrazky-figures/saml-idp.png}
 	\caption{Ukázka přihlášení vyvolané idp\cite{SAMLxOIDC}}
 	\label{saml-flow}
 \end{figure}
@@ -227,7 +235,75 @@ ShibRequestSetting requireSession true
 
 
 \section{Discovery service}
-Pro používání více než jednoho idp je potřeba nastavit discovery service, kde si může uživatel vybrat kterého chce použít identity providera. Pro jednoduché řešení stačí statická webová stránka s přesměrováními na různé identity providery, pro řešení obsahující desítky idp je lepší využít discovery service od Shibbolethu. Zde hodně záleží na konkrétní aplikaci. Různé možnosti implementace jsou popsané v dokumentaci \cite{IdPDiscovery}. 
+Pro používání více než jednoho idp je potřeba nastavit discovery service, kde si může uživatel vybrat kterého chce použít identity providera. Pro jednoduché řešení stačí statická webová stránka s přesměrováními na různé identity providery, pro řešení obsahující desítky idp je lepší využít discovery service od Shibbolethu. Zde hodně záleží na konkrétní aplikaci. Různé možnosti implementace jsou popsané v dokumentaci \cite{IdPDiscovery}.
+
+\subsection{Embedded Discovery Service}
+Je jednoduchá applikace od shibboleth napsaná v javascriptu. 
+
+\subsection{Embedded Discovery Service - návod}
+Tato sekce byla inspirována následujícím návodem TODO .
+instalace EDS
+\begin{lstlisting}[language=Bash]
+  sudo su -
+
+cd /usr/local/src
+
+wget https://shibboleth.net/downloads/embedded-discovery-service/latest/shibboleth-embedded-ds-1.2.2.tar.gz -O shibboleth-eds.tar.gz
+
+tar xzf shibboleth-eds.tar.gz
+
+cd shibboleth-embedded-ds-1.2.2
+
+apt install make
+
+make install
+\end{lstlisting}
+
+povolení webové stránky EDS
+
+\begin{lstlisting}[language=Bash]
+mv /etc/shibboleth-ds/shibboleth-ds.conf /etc/apache2/conf-available/shibboleth-ds.conf
+
+a2enconf shibboleth-ds.conf
+
+systemctl restart apache2.service
+\end{lstlisting}
+
+V Shibboleth SP nastavení (/etc/shibboleth/shibboleth2.xml), je potřeba udělat následující:
+1. SSO přepsat následovně:
+
+\begin{lstlisting}[language=Bash]
+<SSO discoveryProtocol="SAMLDS" 
+     discoveryURL="https://###YOUR.SP.FQDN###/shibboleth-ds/index.html">
+   SAML2 SAML1
+</SSO>
+\end{lstlisting}
+
+odkomentovat DiscoveryFeed handler a SessionInitiator handler
+
+\begin{lstlisting}[language=Bash]
+<Handler type="DiscoveryFeed" Location="/DiscoFeed"/>
+ <Handler type="SessionInitiator" Location="/Login"/>
+\end{lstlisting}
+
+následně je třeba restartovat shibd a apache2 .
+
+\begin{lstlisting}[language=Bash]
+systemctl restart shibd.service
+systemctl restart apache2.service
+\end{lstlisting}
+
+Dále je potřeba nastavit whitelist návratových adress v souboru idpselect_config.js, který se nachází v nastavení EDS (/etc/shibboleth-ds/idpselect_config.js)
+
+v položce this.returnWhiteList je třeba změnit url aby odpovídala vašemu SP. 
+
+\begin{lstlisting}[language=Bash]
+this.returnWhiteList = [ "^https:\/\/vasedomena\.com\/Shibboleth\.sso\/Login.*$" , "^https:\/\/vasedomena\.com\/Shibboleth\.sso\/Login.*$" ];
+\end{lstlisting}
+
+Teď když zkusíte na vaši stránce zajít na nějaký zdroj chráněný pomocí Shibboleth, tak by vás to mělo přesměrovat na stránku podobnou té na následujícím obrázku:
+Zde se dá jednoduše vybrat idp, na jehož přihlašovací obrazovku vás to následně přesměruje.
+
 \chapter{config}
 Popis důležitých částí nastavení, které jsou nutné k správnému fungování shibboleth sp. Detailní informace jsou k nalezení na webu\cite{SPconfig}. 
 
@@ -263,6 +339,7 @@ Metadata se nahrávají ze souboru.
 
 
 \section{attribute-map.xml}
+TODO: https://shibboleth.atlassian.net/wiki/spaces/SP3/pages/2070414225/XMLAttributeExtractorExamples
 Obsahuje informace o mapování atributů přijatých od identity provideru na proměnné service provideru. Soubor obsahuje nějaké základní mapování, ale pro většinu aplikací bude nutné tento soubor upravit.
 
 Následuje příklad přidání jednoduchého atributu, kde jméno atributu přijatého od idp je FavoriteFruit a favFruit je jméno používané v proměnných sp\cite{AddAttribute}.
