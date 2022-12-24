@@ -1,13 +1,16 @@
 \chapter{Úvod}
-Tato práce se zabývá modely víceúrovňové autentizace, převážně principy jednotného přihlášení SSO. Obsahuje základní informace o různých řešeních a dále se blíže zabývá standardem SAML a jeho implementací v podobě Shibboleth. 
-Tato práce také obsahuje návody jak zprovoznit Shibboleth SP, napojit ho na různé poskytovatele identity což je ukázáno na Azure a SAMLtest. Nastavení EDS pro využívání více IDP současně . Také jeho využití s Apache.
+Tato práce se zabývá modely víceúrovňové autentizace. Jejím cílem je nalézt způsob pro přístup k jednomu zdroji z více univerzit za využití tamních přihlašovacích údajů.\\
+Obsahuje základní informace o různých řešeních a dále se blíže zabývá modelem SSO v podobně standardu SAML a jeho konkrétní implementací Shibboleth.\\
+Tato práce také obsahuje návody jak zprovoznit Shibboleth SP, napojit ho na různé poskytovatele identity což je ukázáno na Azure a SAMLtest, nastavení EDS pro využívání více IDP současně. A také využití Shibboleth SP s Apache2.\\
+
+
 \section{Terminologie}
 \subsection{Autentizace}
-proces ověření identity subjektu. Většinou následuje autorizace.\cite{Authorization}
+Proces ověření identity subjektu. Většinou následuje autorizace.\cite{Authorization}
 \subsection{Autorizace}
-proces pro specifikování přístupových práv ke zdrojům.\cite{Autentizace}
- \subsection{federované identity}
- TODO
+Proces pro specifikování přístupových práv ke zdrojům.\cite{Autentizace}
+ \subsection{Federované identity}
+Způsob propojení identity uživatele napříč více nezávislými systémy. \cite{federatedIdentities}
 
 
 
@@ -16,21 +19,18 @@ proces pro specifikování přístupových práv ke zdrojům.\cite{Autentizace}
 \label{sso}
 SSO (Single Sign-On) je mechanizmus pro jednotné přihlášení. Umožňuje uživateli se přihlásit na jednom místě a následně využívat toto přihlášení pro přístup k více nezávislým aplikacím. \cite{SSO}
 
-\section{Vícefázová autentizace}
-Jedná se o bezpečnostní mechanizmus, kdy uživatel poskytuje dva nebo více faktorů prokazujících jeho identitu \cite{wiki2FA}
-
-
 \section{Proxy autentizace}
-Je mechanizmus udržení identity a práv uživatele skrze více úrovní. Znamená to že uživatel přistupuje celou dobu skrze aplikaci na které se přihlásil, namísto přeposílání atributů třetí straně. Přihlašovací aplikace slouží tedy jako proxy server pro aplikaci třetí strany. \cite{ProxyA} \\ \\
+Je mechanizmus udržení identity a práv uživatele skrze více úrovní. Znamená to že uživatel přistupuje celou dobu skrze aplikaci, na které se přihlásil, namísto přeposílání atributů třetí straně. Přihlašovací aplikace slouží tedy jako proxy server pro aplikaci třetí strany. \cite{ProxyA} \\ \\
 Pro účely této práce není příliš vhodná jelikož většina implementací nemá možnost předávání atributů, nebo jiný způsob odlišení jednotlivých uživatelů od sebe.
 
 \subsection{EZproxy}
-Jedná se o proxy server používaný převážně knihovnami, pro udělování přístupu, k jejich zdrojům uživatelům v různých sítích. Autentizace probíhá převážně pomocí ip adresy.\\
+Jedná se o proxy server používaný převážně knihovnami, pro udělování přístupu, k jejich zdrojům uživatelům v různých sítích. Autentizace probíhá převážně pomocí IP adresy.\\
 EZproxy nemá žádný mechanizmus pro odlišování různých uživatelů. Používá se tedy například pro přístup ke zdrojům knihovny pro celé univerzity. \cite{EZproxy}\cite{wikiEZproxy}
 
 \chapter{SSO}
-Jediný model víceúrovňové autentizace, který se dá pro tuto práci použít je SSO, jelikož se zabývá federovanými identitami.
-Dále je tedy uvedeno pár jeho implementací pomocí různých standardů. 
+
+Nejvhodnější model víceúrovňové autentizace pro tuto práci je SSO, jelikož se zabývá federovanými identitami a spousta univerzit již využívá nějakou implementaci SSO.
+Dále je uvedeno několik jeho implementací pomocí různých standardů. 
 
 \section{SAML}
 
@@ -47,51 +47,51 @@ SP se stará o autorizaci uživatele ke svým zdrojům na základě informací p
 OIDC (OpenID Connect) je otevřený standard umožňující výměnu autentizačních a autorizačních dat mezi více nezávislými subjekty. Je postavený nad protokolem OAuth 2.0.\cite{OIDC}
 
 \section{OAuth 2.0.}
-Na rozdíl od OIDC OAuth 2.0. se stará pouze o Autorizaci. Používá se většinou pro sdílení části dat uživatele s aplikací třetí strany, bez předávat jeho přihlašovací údaje. \\
+Na rozdíl od OIDC OAuth 2.0. se stará pouze o autorizaci. Používá se většinou pro sdílení části dat uživatele s aplikací třetí strany, bez předávání jeho přihlašovacích údajů. \\
 OIDC je potom jeho nadstavba určená přímo pro federované identity. \cite{OAUTHvSAMLvOIDC}
 
 \section{SAML versus OIDC}
 
 SAML je starší z těchto dvou protokolů a využívá k přenosu dat XML. OIDC je novější a využívá k přenosu dat JSON. 
-SAML je momentálně rozšířenější i když OIDC nabírá na popularitě díky jednodušší implementaci a použítí JSONu ke komunikaci.\cite{SAMLxOIDC} \\
-Princip přihlašování je až na různé názvosloví podobný (Service provider (SP) = Relying Party (RP),  Identity Provider (IDP) = OpenID Provider (OP), atd ..).
-Princip přihlašování je blíže popsán v sekci \ref{IDPlogin} .
+SAML je momentálně rozšířenější i když OIDC nabírá na popularitě díky jednodušší implementaci a komunikaci přes JSON.\cite{SAMLxOIDC} \\
+Princip přihlašování je až na různé názvosloví podobný (Service Provider (SP) = Relying Party (RP),  Identity Provider (IDP) = OpenID Provider (OP), atd ..).
+Princip přihlašování je blíže popsán v sekci \ref{IDPlogin}.
 
 \section{Shibboleth}
 
-Shibboleth je implementace SAML standardu. Jeho hlavní součástí jsou dvě aplikace. Identity provider(IDP), který slouží jako poskytovatel identity a stará se o autentizaci a Service provider, který slouží jako poskytovatel služeb a stará se o autorizaci po úspěšném přihlášení přes poskytovatele identity. \cite{shibbolethWiki}
+Shibboleth je implementace SAML standardu. Jeho hlavní součástí jsou dvě aplikace. Identity Provider (IDP), který slouží jako poskytovatel identity a stará se o autentizaci a Service Provider (SP), který slouží jako poskytovatel služeb a stará se o autorizaci po úspěšném přihlášení přes poskytovatele identity. \cite{shibbolethWiki}
 
 \subsection{Poskytovatel identity}
 
-Poskytovatel identity se stará o autentizaci uživatelů. Poskytovatel identity po autentizaci uživatele předá poskytovateli služeb informaci o úspěšné authentizaci společně s různými atributy (například: e-mal, uživatelské jméno, role atd...).
+Poskytovatel identity se stará o autentizaci uživatelů. Poskytovatel identity po autentizaci uživatele předá poskytovateli služeb informaci o úspěšné autentizaci společně s různými atributy (například: e-mal, uživatelské jméno, role atd...).
 
 \subsection{Poskytovatel služeb}
 
-Poskytovatel služeb se stará o autorizaci přístupu k různým službám, které poskytuje, na základě informací poskytnutých od poskytovatele identity.
+Poskytovatel služeb se stará o autorizaci přístupu k různým službám, které poskytuje, na základě informací získaných od poskytovatele identity.
 
 \subsection{Postup přihlášení za pomocí IDP}\label{IDPlogin}
 
-Rozlišují se dvě možnosti přihlášení. Přihlášení vyvolané na straně IDP a přihlášení vyvolané na straně SP.
+Rozlišují se dvě možnosti přihlášení. Přihlášení vyvolané na straně IDP (obr. \ref{saml-flow-idp}) a přihlášení vyvolané na straně SP (obr. \ref{saml-flow-sp}).
 
 
-Pokud bylo přihlášení vyvolané na straně SP, tak je uživatel přesměrován na IDP, kde bude IDP vyzván k autentizaci.
-Po úspěšné autentizaci identity provider předá informaci o úspěšné autentizaci společně s různými atributy, na kterých se předem domluvily, service provideru společně s přesměrováním uživatele na původní stránku.
-Tyto informace SP využije k autorizaci různých svých částí.\cite{SAMLxOIDC}
+Pokud bylo přihlášení vyvolané na straně SP, tak je uživatel přesměrován na IDP, kde bude vyzván k autentizaci.
+Po úspěšné autentizaci IDP předá informaci o úspěšné autentizaci s různými uvolněnými atributy SP společně s přesměrováním uživatele na původní stránku.
+Tyto informace SP využije k autorizaci různých svých částí uživateli.\cite{SAMLxOIDC}
 \begin{figure}[bp]
 	\centering
     \includegraphics[width=1\textwidth]{obrazky-figures/saml-sp-cropped.png}
-	\caption{Ukázka přihlášení vyvolané sp\cite{SAMLxOIDC}}
-	\label{saml-flow}
+	\caption{Ukázka přihlášení vyvolané SP\cite{SAMLxOIDC}}
+	\label{saml-flow-sp}
 \end{figure}
 
-Pokud bylo přihlášení vyvolané na straně IDP, tak je uživatel rovnou přesměrován na SP s informaci o úspěšné autentizaci společně s různými atributy, na kterých se předem domluvily.
-Tyto informace service provider využije k autorizaci různých svých částí.\cite{SAMLxOIDC}
+Pokud bylo přihlášení vyvolané na straně IDP, tak je uživatel rovnou přesměrován na SP s informaci o úspěšné autentizaci společně s různými uvolněnými atributy.
+Tyto informace SP využije k autorizaci různých svých částí.\cite{SAMLxOIDC}
 
 \begin{figure}[bp]
 	\centering
     \includegraphics[width=1\textwidth]{obrazky-figures/saml-idp-cropped.png}
-	\caption{Ukázka přihlášení vyvolané idp\cite{SAMLxOIDC}}
-	\label{saml-flow}
+	\caption{Ukázka přihlášení vyvolané IDP\cite{SAMLxOIDC}}
+	\label{saml-flow-idp}
 \end{figure}
 \chapter{Návod}
 \label{návod}
@@ -121,19 +121,19 @@ Shibboleth potřebuje vygenerovat certifikát ke komunikaci s IDP. Localhost je 
     openssl x509 -text -noout -in /etc/shibboleth/sp-cert.pem
 \end{lstlisting}
 
-Nastavení Shiboleth se nachází v /etc/shibboleth/shibboleth2.xml .
+Nastavení Shibboleth se nachází v /etc/shibboleth/shibboleth2.xml .
 
 \begin{lstlisting}[language=Bash]
    sudo vim /etc/shibboleth/shibboleth2.xml
 \end{lstlisting}
 
-Zde je potřeba nastavit následující hodnoty. \\V <ApplicationDefaults> je potřeba nastavit EntityID. EntityID by mělo být jedinečné. Většinou se používá doména aplikace ke které se bude přistupovat přes Shibboleth s cestou /shibboleth. Například: http://vasedomena/shibboleth . Není to ale nutné pro fungování aplikace.
+Zde je potřeba nastavit následující hodnoty. \\V <ApplicationDefaults> je potřeba nastavit EntityID. EntityID by mělo být jedinečné v rámci federace. Většinou se používá doména aplikace ke které se bude přistupovat přes Shibboleth s cestou /shibboleth. Například: http://vasedomena/shibboleth . Není to ale nutné pro fungování aplikace.
 
 Pro povolení SSL je třeba nastavit v <Sessions>  handlerSSL na true a cookieProps na https.
 
-Pod <SSO> se přidá EntityID idp, který se bude používat.
+Pod <SSO> se přidá EntityID IDP, který se bude používat.
 
-Na konec souboru se přidá informace, kde se nachází metadata idp.
+Na konec souboru se přidá informace, kde se nachází metadata IDP.
 \begin{lstlisting}[language=Bash]
  <MetadataProvider type="XML" validate="true"
                 url="https://samltest.id/saml/idp"/>
@@ -149,43 +149,41 @@ Toho se docílí změnou těchto řádků:
             key="sp-encrypt-key.pem" certificate="sp-cert.pem"/>
 \end{lstlisting}
 
-na tyto:
+na následující:
 \begin{lstlisting}[language=Bash]
 <CredentialResolver type="File"
             key="sp-key.pem" certificate="sp-cert.pem"/>
 \end{lstlisting}
 
-následně je třeba restartovat Shibboleth.
+dále je třeba restartovat Shibboleth.
 \begin{lstlisting}[language=Bash]
 sudo service shibd restart
 \end{lstlisting}
 
-Pokud vše funguje, tak na následující adrese by měl být vidět text: "A valid session was not found."
-\begin{lstlisting}[language=Bash]
-https://vasedomena/Shibboleth.sso/Session
-\end{lstlisting}
+Pokud je vše nastaveno správně, tak na následující adrese bude text "A valid session was not found.".\\
+\url{https://vasedomena/Shibboleth.sso/Session}
 
 \section{Propojení s idp}
 
 Zde je uvedeno pár návodů pro propojení SP s různými IDP.
 
-\subsection{SAML test}
+\subsection{SAMLtest}
 SAMLtest je testovací stránka pro debugování SAML aplikací. Většina IDP bude mít stejný postup propojení jako SAMLtest.
 
 
 
-Na následující adresu je třeba nahrát metadata z sp 
+Na následující adresu je třeba nahrát metadata z SP 
 \url{https://samltest.id/upload.php}. Ty se dají získat na následující cestě na doméně kde je hostován SP \url{https://vasedomena//Shibboleth.sso/Metadata}
 
-dále je potřeba v nastavení shibbolethu (/etc/shibboleth/shibboleth2.xml) přidat cestu k metadatům idp.
+dále je potřeba v nastavení Shibboleth SP (/etc/shibboleth/shibboleth2.xml) přidat cestu k metadatům IDP.
 \begin{lstlisting}[language=Bash]
  <MetadataProvider type="XML"
                 url="https://samltest.id/saml/idp"/>
 \end{lstlisting}
 
-Teď, když se zajde na stránku \url{https://samltest.id/start-sp-test/}, tak po vyplnění entityID se dá přihlásit do SP, přes SAMLtest idp.
+Teď, když se zajde na stránku \url{https://samltest.id/start-sp-test/}, tak po vyplnění entityID se dá přihlásit do SP, přes SAMLtest IDP.
 
-Po přihlášení by mělo být vidět na následující cestě na doméně, kde je hostován SP, informace o aktivní relaci \url{http://vasedomena/Shibboleth.sso/Session} 
+Po přihlášení by měly být vidět na následující adrese, informace o aktivní relaci \url{http://vasedomena/Shibboleth.sso/Session} 
 
 
 
@@ -196,15 +194,14 @@ Tato sekce je inspirována tímto návodem\cite{AzureTutorial}
 \\
 Pro propojení s Azure IDP je potřeba udělat následující kroky
 \begin{itemize}
-    \item nejprve je potřeba vytvořit aplikaci, která bude sloužit jako idp
+    \item nejprve je potřeba vytvořit aplikaci, která bude sloužit jako IDP
     \begin{itemize}
-    \item v Azure portalu u Azure services je třeba kliknout na Azure Active Directory
+    \item v Azure Portalu u Azure Services je třeba kliknout na Azure Active Directory
     \item vlevo ve sloupci pod manage otevřít Enterprise applications
     \item kliknout na New application
     \item kliknout na Create your own application
     \item tlačítkem Create potvrdit vytvoření aplikace
     \end{itemize}
-    \item dále je třeba nastavit tuto aplikaci aby používala SAML.
     \item v aplikaci vlevo pod položkou Single sign-on se vybere SAML a dále je potřeba nastavit následující
     \item Basic SAML Configuration
     \begin{itemize}
@@ -236,15 +233,15 @@ Namespace se nahradí za namespace atributu. Name se nahradí za název atributu
     
 
 
-    \item Dále je třeba nahrát pomocí tlačítka vlevo nahoře "Upload metadata file" metadata SP. Tyto metadata najdete na této cestě u vašeho SP \url{http://vasedomena/Shibboleth.sso/Metadata}
+    \item Dále je třeba nahrát pomocí tlačítka vlevo nahoře "Upload metadata file" metadata SP. Tato metadata jsou k nalezení na této cestě u vašeho SP \url{http://vasedomena/Shibboleth.sso/Metadata}
 
 \end{itemize}
 
-Po nastavení se dá aplikace otestovat tlačítkem Test. Aplikace by vás měla přesměrovat na doménu vaší aplikace a následně na následující adrese \url{https://vasedomena/Shibboleth.sso/Session} by měla být vidět aktivní session a názvy atributů, které IDP předal SP.
+Po nastavení se dá aplikace otestovat tlačítkem Test. Aplikace by vás měla přesměrovat na doménu vaší aplikace a následně na následující adrese \url{https://vasedomena/Shibboleth.sso/Session} by měla být vidět aktivní relace a názvy atributů, které IDP předal SP.
 
 \section{Používání v Apache}
 
-Pro využití Shiboleth v Apache stačí uvést do .htaccess, co je vyžadováno za oprávnění od uživatele. Více informací o sytaxi je k nalezení v dokumentaci\cite{SPApache}\cite{SPhtaccess} \linebreak
+Pro využití Shibboleth v Apache stačí uvést do .htaccess, co je vyžadováno za oprávnění od uživatele. Více informací o sytaxi je k nalezení v dokumentaci\cite{SPApache}\cite{SPhtaccess} \linebreak
 
 příklad .htaccess pro přístup uživatele testuser@gmail.com:
 
@@ -253,7 +250,7 @@ příklad .htaccess pro přístup uživatele testuser@gmail.com:
     AuthType shibboleth
     # nastavi vyzadovani Shibboleth session
     ShibRequestSetting requireSession true
-    # nasledujici block nastavi ze je vyzadovana kombinace techto parametru
+    # nasledujici blok nastavi ze je vyzadovana kombinace techto parametru
 <RequireAll>
   # nastavi ze je vyzadovan shibboleth k pristupu
   require shibboleth 
@@ -264,7 +261,7 @@ příklad .htaccess pro přístup uživatele testuser@gmail.com:
 
 
 \section{Discovery service}
-Pro používání více než jednoho idp je potřeba nastavit discovery service, kde si může uživatel vybrat jakého poskytovatele identity chce použít. Pro jednoduché řešení stačí statická webová stránka s přesměrováními na různé identity providery, pro řešení obsahující více idp je lepší využít discovery service od Shibboleth. Zde hodně záleží na konkrétní aplikaci. Různé možnosti implementace jsou popsané v dokumentaci \cite{IdPDiscovery}.
+Pro používání více než jednoho IDP je potřeba nastavit discovery service, kde si může uživatel vybrat jakého poskytovatele identity chce použít. Pro jednoduché řešení stačí statická webová stránka s přesměrováními na různé poskytovatele služeb, pro řešení obsahující více IDP je lepší využít discovery service od Shibboleth. Různé možnosti implementace jsou popsané v dokumentaci \cite{IdPDiscovery}.
 
 \subsection{Embedded Discovery Service}
 Je jednoduchá discovery service od Shibboleth napsaná v javascriptu. 
@@ -292,7 +289,8 @@ make install
 povolení webové stránky EDS
 
 \begin{lstlisting}[language=Bash]
-mv /etc/shibboleth-ds/shibboleth-ds.conf /etc/apache2/conf-available/shibboleth-ds.conf
+mv /etc/shibboleth-ds/shibboleth-ds.conf \
+/etc/apache2/conf-available/shibboleth-ds.conf
 
 a2enconf shibboleth-ds.conf
 
@@ -306,7 +304,7 @@ SSO změnit následovně:
 
 \begin{lstlisting}[language=Bash]
 <SSO discoveryProtocol="SAMLDS" 
-     discoveryURL="https://###YOUR.SP.FQDN###/shibboleth-ds/index.html">
+     discoveryURL="https://vasedomena/shibboleth-ds/index.html">
    SAML2 SAML1
 </SSO>
 \end{lstlisting}
@@ -318,24 +316,24 @@ odkomentovat DiscoveryFeed handler a SessionInitiator handler
 <Handler type="SessionInitiator" Location="/Login"/>
 \end{lstlisting}
 \end{itemize}
-následně je třeba restartovat shibd a apache2 .
+Následně je třeba restartovat Shibboleth SP a Apache2.
 
 \begin{lstlisting}[language=Bash]
 systemctl restart shibd.service
 systemctl restart apache2.service
 \end{lstlisting}
 
-Dále je potřeba nastavit whitelist návratových adress v souboru idpselect\_config.js, který se nachází v nastavení EDS (/etc/shibboleth-ds/idpselect\_config.js)
+Dále je potřeba nastavit whitelist návratových adres v souboru idpselect\_config.js, který se nachází v nastavení EDS (/etc/shibboleth-ds/idpselect\_config.js)
 
 v položce this.returnWhiteList je třeba změnit url aby odpovídala vašemu SP. 
 
-\begin{lstlisting}[language=javascript]
+\begin{lstlisting}[]
 this.returnWhiteList = 
 ["^https:\/\/vasedomena\.com\/Shibboleth\.sso\/Login.*$",
  "^https:\/\/vasedomena\.com\/Shibboleth\.sso\/Login.*$"];
 \end{lstlisting}
 
-Teď když se zkusí zajít na na nějaký zdroj chráněný pomocí Shibboleth, tak dojde k přesměrování na stránku podbné té na obrázku \ref{EDS}.
+Teď když se zkusí zajít na na nějaký zdroj chráněný pomocí Shibboleth, tak dojde k přesměrování na stránku podobné té na obrázku \ref{EDS}.
 
 \begin{figure}[bp]
 	\centering
@@ -346,11 +344,11 @@ Teď když se zkusí zajít na na nějaký zdroj chráněný pomocí Shibboleth,
 
 Zde si může uživatel jednoduše vybrat IDP, na jehož přihlašovací stránku chce být přesměrován.
 
-\chapter{config}
-Popis důležitých částí nastavení, které jsou nutné k správnému fungování shibboleth sp. Detailní informace jsou k nalezení na webu\cite{SPconfig}. 
+\chapter{Config}
+Popis důležitých částí nastavení, které jsou nutné k správnému fungování Shibboleth SP. Detailní informace jsou k nalezení na webu\cite{SPconfig}. 
 
 \section{shibboleth2.xml}
-Hlavní config soubor shibbolethu. Nachází se na cestě /etc/shibboleth/shibboleth2.xml .
+Hlavní config soubor Shibboleth SP. Nachází se na cestě /etc/shibboleth/shibboleth2.xml .
 
 \subsection{ApplicationDefaults}
 \begin{lstlisting}[language=xml]
@@ -367,7 +365,7 @@ Hlavní config soubor shibbolethu. Nachází se na cestě /etc/shibboleth/shibbo
     Tento atribut bude následně k dispozici z proměnné REMOTE\_USER.
 \end{itemize}
 \subsection{MetadataProvider}
-Definuje kde se nachází metadata identity provideru. Pro většinu aplikací by mělo stačit jedno z následujících nastavení. Více informací lze nalézt na webových stránkách\cite{MetadataProvider}.
+Definuje kde se nachází metadata IDP. Pro většinu aplikací by mělo stačit jedno z následujících nastavení. Více informací lze nalézt na webových stránkách\cite{MetadataProvider}.
 \linebreak \linebreak
 Metadata se nahrávají z url.
 \begin{lstlisting}[language=Bash]
@@ -383,7 +381,7 @@ Metadata se nahrávají ze souboru.
 \section{attribute-map.xml}
 Obsahuje informace o mapování atributů přijatých od IDP na proměnné SP. Soubor obsahuje nějaké základní mapování, ale pro většinu aplikací bude nutné tento soubor upravit.
 
-Následuje příklad přidání jednoduchého atributu, kde jméno atributu přijatého od idp je FavoriteFruit a favFruit je jméno používané v proměnných sp\cite{AddAttribute}.
+Následuje příklad přidání jednoduchého atributu, kde jméno atributu přijatého od IDP je FavoriteFruit a favFruit je jméno používané v proměnných SP\cite{AddAttribute}.
  \begin{lstlisting}[language=XML]
      <Attribute name="FavoriteFruit"
     nameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:basic"
@@ -393,8 +391,11 @@ Následuje příklad přidání jednoduchého atributu, kde jméno atributu při
 Toto nastavení by mělo být dostačující pro většinu aplikací. Více informací lze nalézt na webových stránkách\cite{AddAttribute}.
 
 \chapter{Závěr}
-Z používaných technologií byl zvolen SAML, protože již existovala jeho implementace přímo pro potřeby univerzit a společně s OIDC patří k nejrozšířenějším SSO technologiím.
-Podařilo se nastavit Shibboleth SP pro základní přihlašování se dvěma poskytovateli identit a byly sepsány stručné návody pro základní sprovoznění SP, jeho napojení na 2 různé IDP a nastavení EDS pro využívání více IDP.
+V úvodu bylo prozkoumáno několik různých modelů pro víceúrovňovou autentizaci. Z těchto modelů bylo pro potřeby projektu zvoleno SSO, jelikož umožňovalo federovat identity uživatelů mezi více institucí s technologiemi, které již byli na těchto institucích většinou implementovány a také pro jednoduchou rozšiřitelnost o další instituce. 
+\\
+Z používaných technologií byl zvolen SAML, protože již existovala jeho implementace přímo pro potřeby univerzit a společně s OIDC patří k nejrozšířenějším SSO technologiím. \\
+Touto implementací je Shibboleth, který je na řadě univerzit již implementován, nebo je implementován nějaký IDP, který je s ním kompatibilní (Azure, Google Suite, atd...).\\
+Podařilo se nastavit Shibboleth SP pro základní přihlašování se dvěma poskytovateli identit (SAMLtest a Azure) a byly sepsány stručné návody pro základní zprovoznění SP, jeho napojení na 2 různé IDP, propojení s webovým serverem Apache2 a nastavení EDS pro využívání více IDP.
 
 \label{zaver}
 
