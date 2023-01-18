@@ -185,7 +185,41 @@ Teď, když se zajde na stránku \url{https://samltest.id/start-sp-test/}, tak p
 
 Po přihlášení by měly být vidět na následující adrese informace o aktivní relaci \url{http://vasedomena/Shibboleth.sso/Session}.
 
+\subsection{VUT}
+Propojení s poskytovatelem identity VUT je velice podobné jako propojení se SAMLtest.
 
+
+
+Je třeba VUT zaslat metadata SP. Ty se dají získat na následující cestě na doméně, kde je hostován SP \url{https://vasedomena//Shibboleth.sso/Metadata}.
+
+Dále je potřeba v nastavení Shibboleth SP (/etc/shibboleth/shibboleth2.xml) přidat cestu k metadatům IDP.
+\begin{lstlisting}[language=XML]
+ <MetadataProvider type="XML"
+  url="https://app.fit.vut.cz/simplesaml/saml2/idp/metadata.php"/>
+\end{lstlisting}
+
+Změna oproti SAMLtest je že IDP od VUT nepodepisuje logout odpovědi, takže je třeba nastavit u SP ignorování nepodepsaných logout odpovědí. To se udělá následovně.\\
+V souboru  "/etc/shibboleth/security-policy.xml" přidat následující řádky:
+\begin{lstlisting}[language=XML]
+<!-- Turns off the requirement of having signed LogoutResponses -->
+<Policy id="unsigned-slo">
+  <PolicyRule type="NullSecurity"/>
+</Policy>
+\end{lstlisting}
+
+ v nastavení Shibboleth SP (/etc/shibboleth/shibboleth2.xml)
+ změnit tento řádek:
+ \begin{lstlisting}[language=XML]
+ <Logout>SAML2 Local</Logout>
+\end{lstlisting}
+na tento:
+ \begin{lstlisting}[language=XML]
+ <Logout conf:policyId="unsigned-slo">SAML2 Local</Logout>
+\end{lstlisting}
+
+Teď, když se zajde na stránku \url{https://samltest.id/start-sp-test/}, tak po vyplnění entityID se dá přihlásit do SP přes SAMLtest IDP.
+
+Po přihlášení by měly být vidět na následující adrese informace o aktivní relaci \url{http://vasedomena/Shibboleth.sso/Session}.
 
 \subsection{Azure}
 
