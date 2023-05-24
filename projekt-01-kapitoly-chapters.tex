@@ -11,8 +11,8 @@ Proces ověření identity subjektu. Většinou následuje autorizace.\cite{Auth
 Proces pro specifikování přístupových práv ke zdrojům.\cite{Autentizace}
  \subsection{Federované identity}
 Způsob propojení identity uživatele napříč více nezávislými systémy. \cite{federatedIdentities}
-
-
+\subsection{CMS} %IP@
+Systém pro správu obsahu (CMS-Content Management System) je software zajišťující správu dokumentů, nejčastěji webového obsahu. % todo cite  https://cs.wikipedia.org/wiki/Syst%C3%A9m_pro_spr%C3%A1vu_obsahu
 
 \chapter{Modely víceúrovňové autentizace}
 \section{SSO}
@@ -93,12 +93,49 @@ Tyto informace SP využije k autorizaci různých svých částí.\cite{SAMLxOID
 	\caption{Ukázka přihlášení vyvolané IDP\cite{SAMLxOIDC}}
 	\label{saml-flow-idp}
 \end{figure}
-\chapter{Návod}
+
+
+\section{SimpleSamlPHP} %IP2
+
+Je aplikace napsaná v php, která se stará o autentizaci a autorizaci pomocí SAML protokolu. Jedná se o jednu z nejrošířenějších opensource implmentací SAML protokolu.\\
+
+Má jednoduché používání, dobrou dokumentaci a i spoustu pokročilejších funkcí.
+%TODO citace https://simplesamlphp.org/
+
+\section{SimpleSamlPHP výhody oproti Shibbolethu} %IP2
+
+SimpleSAMLphp má lepší dokumentaci, je rozšířenější a tedy existuje i více informací na internetu. Jeho nastavení je jednodušší, podporuje více IDP a SP na stejné instanci. Je možné nastavit specifické nastavení (např: mapování attributů) přímo pro jednotlivá IDP.TODO: dokončit.
+
+\chapter{Organizace a projekty} %IP2
+
+Zde jsou organizace a projekty, do kterých je již velká část univerzit zapojená, které se starají o autentizaci a dají se tedy využít v rámci projektu.
+
+\section{EULiST} %IP2
+Jedná se o evropský projekt, v rámci kterého spolupracuje několik univerzit napříč Evropou a tvoří tak univerzitní alianci. Do této aliance v době psaní této práce patří Slovenská technická univerzita v Bratislave, Vysoké učení tehchnické v Brně,  Leibniz Universität Hannover, LUT University, Jönköping University, Rey Juan Carlos University, Technische Universität Wien, University of L’Aquila a Institut Mines-Télécom.
+
+%TODO cite https://eulist.university/
+
+\section{EduGAIN} %IP2
+
+EduGAIN je služba co se stará o propojení již existujících federací poskytovatelů identity. Toto velmi ulehčí přidávání a odebírání nových poskytovatelů identity a služeb, jelikož není pak třeba vyměnit si metadata s každým poskytovatelem identity/služeb. Do Edugain se mohou přidat pouze celé \emph{federace}. \\%TODO: cite https://en.wikipedia.org/wiki/EduGAIN
+%https://edugain.org/
+EduGAIN je převážně zaměřený na výzkum a vzdělání.
+
+\section{Eduid} %IP2
+
+Jedná se o českou akademickou federaci identit, kterou zpravuje CESNET. 
+Využívá ke své funkčnosti jako backend Shibboleth, ale je kompatabilní s jakoukoli SAML implementací, včetně simplesamlphp. Členem Shibbolethu je i CESNET.
+
+%TODO citace https://www.eduid.cz/
+
+\chapter{Návody}
 \label{návod}
 
-Zde následuje návod jak nainstalovat a nastavit Shibboleth SP tak, aby ho bylo možné propojit s IDP. Jedná se převážně o aktualizaci tohoto návodu\cite{shibbolethSpInstallation} v kombinaci s informacemi na oficiální wiki implementace Shibboleth\cite{shibbolethWikiSP}
+V této kapitole jsou k nalezení návody na nastavení různých řešení pro zprovoznění SSO.
 
-\section{Instalace SP}
+\section{Instalace Shibboleth SP} \label{instalaceShibboleth}
+
+Zde následuje návod jak nainstalovat a nastavit Shibboleth SP tak, aby ho bylo možné propojit s IDP. Jedná se převážně o aktualizaci tohoto návodu\cite{shibbolethSpInstallation} v kombinaci s informacemi na oficiální wiki implementace Shibboleth\cite{shibbolethWikiSP}
 
 Nejdříve je třeba nainstalovat web server. Tento návod využívá Apache2.
 \begin{lstlisting}[language=Bash]
@@ -163,7 +200,7 @@ sudo service shibd restart
 Pokud je vše nastaveno správně, tak na následující adrese bude text: "A valid session was not found."\\
 \url{https://vasedomena/Shibboleth.sso/Session}
 
-\section{Propojení s idp}
+\section{Propojení Shibboleth s idp}
 
 Zde je uvedeno pár návodů pro propojení SP s různými IDP.
 
@@ -294,7 +331,7 @@ Příklad .htaccess pro přístup uživatele testuser@gmail.com:
     \end{lstlisting}
 
 
-\section{Discovery service}
+\section{Shibboleth discovery service}
 Pro používání více než jednoho IDP je potřeba nastavit discovery service, kde si může uživatel vybrat jakého poskytovatele identity chce použít. Pro jednoduché řešení stačí statická webová stránka s přesměrováními na různé poskytovatele služeb, pro řešení obsahující více IDP je lepší využít discovery service od Shibboleth. Různé možnosti implementace jsou popsané v dokumentaci \cite{IdPDiscovery}.
 
 \subsection{Embedded Discovery Service}
@@ -378,58 +415,349 @@ Teď, když se zkusí zajít na nějaký zdroj chráněný pomocí Shibboleth, t
 
 Zde si může uživatel jednoduše vybrat IDP, na jehož přihlašovací stránku chce být přesměrován.
 
-\chapter{Config}
-Popis důležitých částí nastavení, které jsou nutné k správnému fungování Shibboleth SP. Detailní informace jsou k nalezení na webu\cite{SPconfig}. 
+\section{SimpleSamlPHP} %IP2
+V této sekci jsou veškeré návody potřebné k základnímu nastavení SimpleSamlPHP.
+\subsection{Instalace}
+Návod na instalaci SimpleSamlPHP lze nalézt na webových stránkách % TODO cite (https://simplesamlphp.org/docs/stable/simplesamlphp-install).
 
-\section{shibboleth2.xml}
-Hlavní config soubor Shibboleth SP. Nachází se na cestě /etc/shibboleth/shibboleth2.xml .
+\subsection{Nastavení} %IP2
+K základnímu nastavení slouží soubor config.php, který se nachází v adresáři simplesamlphp/config.
 
-\subsection{ApplicationDefaults}
-\begin{lstlisting}[language=xml]
-<ApplicationDefaults entityID="https://vasedomena/shibboleth"
-        REMOTE_USER="NameID"
-        cipherSuites="DEFAULT:!EXP:!LOW:!aNULL:!eNULL:!DES:!IDEA:
-        !SEED:!RC4:!3DES:!kRSA:!SSLv2:!SSLv3:!TLSv1:!TLSv1.1">
+K nastavení metadat, jsou soubory ve složce simplesamlphp/config/metadata. Zde se nachází soubory pro nastavení metadat pro IDP, které SP využívá, pro SAML IDP se využívá soubor saml20-idp-remote.php.
+
+Mapování atributů lze nastavit na více místech, více v sekci \ref{attributemap_ssphp}.
+
+Pro nastavení kromě config souborů existuje i administrační stránka, která je dostupná na adrese vase.domena/simplesaml. Zde je možné nastavit některé parametry, které jsou v config souborech, ale drtivou většinu nastavení je potřeba upravovat přes config soubory.
+Více informací v dokumentaci. %(TODO: https://simplesamlphp.org/docs/stable/index.html)
+
+\subsubsection{Přidávání nových IDP} %IP2
+
+Pro přidání IDP stačí do souboru simplesamlphp/config/metadata/saml20-idp-remote.php přidat nový záznam.
+
+Získat metadata ve správném formátu lze pomocí aplikace na stránce nastavení vašeho sp vase.domena/simplesaml.
+Zde po přihlášení v záložce federation, je nástroj \emph{XML to SimpleSAMLphp metadata converter}, který po nahrání metadat převede metadata do správného formátu.
+Více informací lze nalézt v dokumentaci.%(TODO: https://simplesamlphp.org/docs/stable/simplesamlphp-sp)
+\\
+zde následuje příklad metadat pro vutbr.cz (některé informace byli z důvodu bezpečnosti odstraněny).
+\begin{lstlisting}[language=json]
+
+    $metadata['https://app.fit.vut.cz/simplesaml/saml2/idp/'] = array (
+        'entityid' => 'https://app.fit.vut.cz/simplesaml/saml2/idp/',
+        'description' =>
+        array (
+          'en' => 'Faculty of information technology BUT',
+          'cs' => 'Fakulta informačních technologií VUT',
+        ),
+        'OrganizationName' =>
+        array (
+          'en' => 'Faculty of information technology BUT',
+          'cs' => 'Fakulta informačních technologií VUT',
+        ),
+        'name' =>
+        array (
+          'en' => 'Faculty of information technology BUT',
+          'cs' => 'Fakulta informačních technologií VUT',
+        ),
+        'OrganizationDisplayName' =>
+        array (
+          'en' => 'Faculty of information technology BUT',
+          'cs' => 'Fakulta informačních technologií VUT',
+        ),
+        'url' =>
+        array (
+          'en' => 'https://www.fit.vut.cz/.en',
+          'cs' => 'https://www.fit.vut.cz/.cs',
+        ),
+        'OrganizationURL' =>
+        array (
+          'en' => 'https://www.fit.vut.cz/.en',
+          'cs' => 'https://www.fit.vut.cz/.cs',
+        ),
+        'contacts' =>
+        array (
+          0 =>
+          array (
+            'contactType' => 'support',
+            'company' => 'CVT FIT VUT',
+            'givenName' => 'Jméno',
+            'surName' => 'Prijmeni',
+            'emailAddress' =>
+            array (
+              0 => 'mail',
+            ),
+            'telephoneNumber' =>
+            array (
+              0 => '123 123 123',
+            ),
+          ),
+          1 =>
+          array (
+            'contactType' => 'technical',
+            'givenName' => 'jmeno',
+            'emailAddress' =>
+            array (
+              0 => 'mailto:mail',
+            ),
+          ),
+        ),
+        'metadata-set' => 'saml20-idp-remote',
+        'sign.authnrequest' => true,
+        'SingleSignOnService' =>
+        array (
+          0 =>
+          array (
+            'Binding' => 'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect',
+            'Location' => 'https://app.fit.vut.cz/simplesaml
+            /saml2/idp/SSOService.php',
+          ),
+        ),
+        'SingleLogoutService' =>
+        array (
+          0 =>
+          array (
+            'Binding' => 'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect',
+            'Location' => 'https://app.fit.vut.cz/simplesaml
+            /saml2/idp/SingleLogoutService.php',
+          ),
+        ),
+        'ArtifactResolutionService' =>
+        array (
+        ),
+        'NameIDFormats' =>
+        array (
+          0 => 'urn:oasis:names:tc:SAML:2.0:nameid-format:transient',
+        ),
+        'keys' =>
+        array (
+          0 =>
+          array (
+            'encryption' => false,
+            'signing' => true,
+            'type' => 'X509Certificate',
+            'X509Certificate' => 'zde by byl certifikát',
+          ),
+          1 =>
+          array (
+            'encryption' => true,
+            'signing' => false,
+            'type' => 'X509Certificate',
+            'X509Certificate' => 'zde by byl certifikát',
+          ),
+        ),
+      );
+
 \end{lstlisting}
+
+\subsubsection{Mapování a filtrování atributů}\label{attributemap_ssphp} %IP2
+Mapování attributů lze nastavit na různých místech dle potřeby.
+
 \begin{itemize}
-    \item entityID \linebreak
-    Název SP. Musí být unikátní v rámci federace identit. Je zvykem využít doménu SP s cestou /shibboleth.  
-    \item REMOTE\_USER \linebreak
-    Zde patří názvy atributů od různých IDP, které slouží k identifikaci uživatele. 
-    Tento atribut bude následně k dispozici z proměnné REMOTE\_USER.
+
+    \item Globálně v config.php.
+    \item Specificky pro jednotlivé SP v authsources.php.
+    \item Specificky pro jednoho IDP v saml20-idp-remote.
+
 \end{itemize}
-\subsection{MetadataProvider}
-Definuje, kde se nachází metadata IDP. Pro většinu aplikací by mělo stačit jedno z následujících nastavení. Více informací lze nalézt na webových stránkách\cite{MetadataProvider}.
-\linebreak \linebreak
-Metadata se nahrávají z url.
-\begin{lstlisting}[language=Bash]
- <MetadataProvider type="XML" validate="true"
-                url="https://samltest.id/saml/idp"/>
+
+Jedno ze základních jednoduchých mapování je například přejmenování attributu. Toto se dělá pomocí \emph{core:AttributeMap}.
+
+\begin{lstlisting}[json]
+    'authproc' => [
+        50 => [
+            'class' => 'core:AttributeMap',
+            'urn:oasis:names:tc:SAML:attribute:subject-id' => 'subject-id',
+            'urn:oid:2.5.4.20' => 'phone',
+        ],
+    ],
 \end{lstlisting}
-Metadata se nahrávají ze souboru.
-\begin{lstlisting}[language=Bash]
- <MetadataProvider type="XML" path="/path/to/the/metadata.xml"/>
+
+Toto nastavení namapuje \emph{urn:oasis:names:tc:SAML:attribute:subject-id} na \emph{subject-id} a \emph{urn:oid:2.4.20} na \emph{phone}. Toto nastavení se dá dělat globálně, specificky pro SP nebo specificky pro IDP.
+
+Další možnosti filtrování jsou například
+\begin{itemize}
+    \item core:AddAttributeAdd - přidá atribut
+    \item core:AttributeAlter - vyhledá a nahradí hodnoty atributu
+    \item core:AttributeNameId - vygeneruje NameID z hodnoty atributu
+\end{itemize}
+
+Mapování a filtrování atributů je dále podrobněji popsáno v dokumentaci SimpleSamlPHP. %(TODO citace: https://simplesamlphp.org/docs/stable/simplesamlphp-authproc.html)
+
+
+\subsubsection{Nalezení názvů atributů} %IP2
+Vyhledání názvů uvolněných atributů z IDP lze nalézt v administraci SimpleSamlPHP vase.domena/simplesaml v zalozce Authentication -> Test configured authentication sources -> Vyberte vaseho SP -> vyberte IDP od kterého chcete vyhledat uvolněné attributy. Dále se po přihlášení v idp zobrazí všechny atributy, které jsou uvolněny z IDP.
+
+
+\section{Wordpress} %IP2
+
+Wordpress je opensource CMS napsaný v PHP, který je zaměřený na jednoduchost používání a rozšířitelnost pomocí pluginů. Jedná se o jeden z nejrozšířenějších CMS. Více informací lze nalézt na webových stránkách\cite{TODO-CITE}.
+\\
+Následují návody ke zprovoznění SSO ve Wordpresu.
+
+\subsection{SSO plugin} %IP2
+Do Wordpresu byl otestován jeden plugin na napojení Shibboleth SP k Wordpresu. Jedná se o plugin Shibboleth SP\cite{ShibbolethSP}(TODO citace). Tento plugin funguje, ale obsahuje jen základní nastavení a většinu věcí přenechává samotnému Shibbolethu. TODO cite https://wordpress.org/plugins/shibboleth/#developers
+
+\subsection{instalace Shibboleth modulu} %IP2
+Modul vyžaduje aby byl již nainstalován Shibboleth SP. K tomuto lze využít návod v této sekci \ref{instalaceShibboleth}. Dále je potřeba upravit \emph{.htaccess} Wordpressu, aby ignoroval url cesty /Shibboleth.sso. Tohoto lze například docílit úpravou .htacces v kořenovém adresáři Wordpressu do následující podoby.
+
+\begin{lstlisting}[language=php]
+
+    <IfModule mod_rewrite.c>
+RewriteEngine On
+RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
+RewriteBase /
+RewriteRule ^index\.php$ - [L]
+RewriteCond %{REQUEST_URI} !^/Shibboleth.sso/.*$
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule . /index.php [L]
+</IfModule>
+
+
 \end{lstlisting}
 
+Po té stačí nainstalovat plugin a nastavit mu následující parametry.
 
-\section{attribute-map.xml}
-Obsahuje informace o mapování atributů přijatých od IDP na proměnné SP. Soubor obsahuje nějaké základní mapování, ale pro většinu aplikací bude nutné tento soubor upravit.
+\begin{enumerate}
+    \item V záložce general
+    \begin{enumerate}
+        \item Nastavit login URL na vase.domena/Shibboleth.sso/Login.
+        \item Nastavit logout URL na vase.domena/Shibboleth.sso/Logout.
+    \end{enumerate}
+    \item V záležce User.
+     \begin{enumerate}
+        \item Nastavit mapování atributů na proměnné wordpressu, zadávají se sem parametry namapované v attribute-map.xml.
+        \item Zaškrtnou přepínač \emph{Automaticly create users if they do not exist in Wordpress database} pro automatické vytvoření uživatele při prvním přihlášení přes idp.
+     \end{enumerate}
+\end{enumerate}
 
-Následuje příklad přidání jednoduchého atributu, kde jméno atributu přijatého od IDP je FavoriteFruit a favFruit je jméno používané v proměnných SP\cite{AddAttribute}.
- \begin{lstlisting}[language=XML]
-     <Attribute name="FavoriteFruit"
-    nameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:basic"
-    id="favFruit" />
-    \end{lstlisting}
+Toto je základní nastavení pro aktivování SSO.
+
+\section{Drupal} %IP2
+
+Drupal je také opensource CMS napsaný v PHP, který je zaměřený na rozšířitelnost pomocí pluginů (Drupal je nazývá moduly). Jedná se o jedno z nejrozšířenějších CMS. Oproti Wordpresu má složitější používání.. Více informací lze nalézt na webových stránkách. %TODO cite
+Následují návody ke sprovoznění SSO v Drupalu.
+
+\subsection{SSO plugin} %IP2
+Drtivá většina modulů na SSO pro Drupal využívá nějaký již nainstalovaný backend na hostitelském serveru, většinou SimpleSamlPHP a některé také Shibboleth. Dále jsou zde i komerční moduly jako například od miniOrange (TODO CITE), které jsou většinou již hotová řešení, kde stačí nainstalovat modul. Z důvodu lepší modularity a rozšířitelnosti bylo vybráno opensource řeššení v podobě simplesamlphp.
+
+\subsubsection{Shibboleth modul} %IP2
+    Drupal nemá žádný dobrý Shibboleth modul, který by byl udržovaný, fungoval jednoduše hned po instalaci a měl by nějaké lepší funkce. Nejlepší modul co se povedlo nalézt je tento TODO cite. Bohužel se ale zdá že v současnosti není funkční.
+\subsubsection{SimpleSAMLphp} %IP2
+    Drupal má skvělý modul pro propojení s SimpleSamlPHP, který je velmi jednoduchý na používání a má i nějaké pokročilejší funkce.
+\\ 
+\\
+     Podporované funkce v době psaní této práce (převzato z TODO cite):
+    \begin{itemize}
+        \item Instantní vytváření uživatelských účtů na základě SAML atributů (konfigurovatelné).
+        \item Automatické přiřazování rolí na základě SAML atributů (konfigurovatelné).
+        \item Duální mód - podpora tradičních Drupal účtů a SAML-autentizovaných účtů současně (konfigurovatelné).
+        \item  Podpora více autentizačních protokolů (díky SimpleSAMLphp)
+        \begin{itemize}
+            \item OpenID (např. Google, Yahoo)
+            \item Facebook
+            \item OAuth (např. Twitter)
+            \item SAML 1.1, SAML 2.0
+            \item Shibboleth 1.3
+            \item A-Select
+            \item X509 Client Certificates
+            \item Radius
+        \end{itemize}
+    \end{itemize}
+    \\
+    Příklady použití (převzato z TODO cite):
+    \begin{itemize}
+        \item Enterprise single sign-on --- připojte Drupalové stránky k IdP vaší organizace (stejně jako připojení Google Apps k vašemu IdP)
+        \item Single sign-on napříč Drupal stránkami na více serverech --- nastavte všechny stránky tak, aby používaly tento modul k ověřování uživatelů proti jednomu nebo více IdP. (To lze dokonce provést s více stránkami, které používají jediného poskytovatele služeb SimpleSAMLphp.)
+        \item Federovaná Drupal stránka --- umožněte lidem z více organizací přistupovat na stránku pomocí IdP jejich organizace.
+        \item Přihlášení pomocí Facebooku/Googlu/Twitteru/atd... --- umožněte uživatelům přihlásit se na vaši stránku pomocí jejich účtu na některé z těchto služeb.
+    \end{itemize}
     
-Toto nastavení by mělo být dostačující pro většinu aplikací. Více informací lze nalézt na webových stránkách\cite{AddAttribute}.
+\subsubsection{Instalace simpleSAMLphp modulu} %IP2
+
+Modul se instaluje jako každý jiný Drupal modul. Modul je k nalezení zde (todo: cite https://www.drupal.org/project/simplesamlphp_auth)
+
+SimpleSamlPHP je potřeba mít nastavené aby používalo něco jiného než phpsession jako úložiště relace. Jako úložiště relace se dá použít memcache nebo SQL.
+Toto lze nastavit v simplesamlphp/config/config.php v proměnné store.type.
+Nejjednodušší je nastavit memcache. Další informace lze nalézt v dokumentaci modulu TODO: cite.
+
+\subsubsection{Nastavení simpleSAMLphp modulu} %IP2
+
+Pro základní spuštění stačí v nastavení modulu v drupalu nastavit následující:
+
+\begin{enumerate}
+    \item v \emph{User info and syncing} nastavit atributy které se mají namapovat na atributy drupalu.
+    \item v \emph{Basic settings}
+    \begin{enumerate}
+        \item nastavit \emph{Authentication source for this SP} na vašeho sp.
+        \item Po dokončení nastavení můžete modul aktivovat pomocí \emph{Activate authentication via SimpleSAMLphp}
+    \end{enumerate}
+
+\end{enumerate}
+
+
+
+    % \chapter{Config Shibbolethu} 
+    % Popis důležitých částí nastavení, které jsou nutné k správnému fungování Shibboleth SP. Detailní informace jsou k nalezení na webu\cite{SPconfig}. 
+    
+    % \section{shibboleth2.xml}
+    % Hlavní config soubor Shibboleth SP. Nachází se na cestě /etc/shibboleth/shibboleth2.xml .
+    
+    % \subsection{ApplicationDefaults}
+    % \begin{lstlisting}[language=xml]
+    % <ApplicationDefaults entityID="https://vasedomena/shibboleth"
+    %         REMOTE_USER="NameID"
+    %         cipherSuites="DEFAULT:!EXP:!LOW:!aNULL:!eNULL:!DES:!IDEA:
+    %         !SEED:!RC4:!3DES:!kRSA:!SSLv2:!SSLv3:!TLSv1:!TLSv1.1">
+    % \end{lstlisting}
+    % \begin{itemize}
+    %     \item entityID \linebreak
+    %     Název SP. Musí být unikátní v rámci federace identit. Je zvykem využít doménu SP s cestou /shibboleth.  
+    %     \item REMOTE\_USER \linebreak
+    %     Zde patří názvy atributů od různých IDP, které slouží k identifikaci uživatele. 
+    %     Tento atribut bude následně k dispozici z proměnné REMOTE\_USER.
+    % \end{itemize}
+    % \subsection{MetadataProvider}
+    % Definuje, kde se nachází metadata IDP. Pro většinu aplikací by mělo stačit jedno z následujících nastavení. Více informací lze nalézt na webových stránkách\cite{MetadataProvider}.
+    % \linebreak \linebreak
+    % Metadata se nahrávají z url.
+    % \begin{lstlisting}[language=Bash]
+    %  <MetadataProvider type="XML" validate="true"
+    %                 url="https://samltest.id/saml/idp"/>
+    % \end{lstlisting}
+    % Metadata se nahrávají ze souboru.
+    % \begin{lstlisting}[language=Bash]
+    %  <MetadataProvider type="XML" path="/path/to/the/metadata.xml"/>
+    % \end{lstlisting}
+    
+    
+    % \section{attribute-map.xml}
+    % Obsahuje informace o mapování atributů přijatých od IDP na proměnné SP. Soubor obsahuje nějaké základní mapování, ale pro většinu aplikací bude nutné tento soubor upravit.
+    
+    % Následuje příklad přidání jednoduchého atributu, kde jméno atributu přijatého od IDP je FavoriteFruit a favFruit je jméno používané v proměnných SP\cite{AddAttribute}.
+    %  \begin{lstlisting}[language=XML]
+    %      <Attribute name="FavoriteFruit"
+    %     nameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:basic"
+    %     id="favFruit" />
+    %     \end{lstlisting}
+        
+    % Toto nastavení by mělo být dostačující pro většinu aplikací. Více informací lze nalézt na webových stránkách\cite{AddAttribute}.
+
 
 \chapter{Závěr}
-V úvodu bylo prozkoumáno několik různých modelů pro víceúrovňovou autentizaci. Z těchto modelů bylo pro potřeby projektu zvoleno SSO, jelikož umožňovalo federovat identity uživatelů mezi více institucí s technologiemi, které již byly na těchto institucích většinou implementovány a také pro jednoduchou rozšiřitelnost o další instituce. 
+
+
+V úvodu bylo prozkoumáno několik různých modelů pro víceúrovňovou autentizaci. Z těchto modelů bylo pro potřeby projektu zvoleno SSO, jelikož umožňovalo federovat identity uživatelů mezi více institucí s technologiemi, které již byly na těchto institucích většinou implementovány a také pro jednoduchou rozšiřitelnost o další instituce.
 \\
 Z používaných technologií byl zvolen SAML, protože již existovala jeho implementace přímo pro potřeby univerzit a společně s OIDC patří k nejrozšířenějším SSO technologiím. \\
 Touto implementací je Shibboleth, který je na řadě univerzit již implementován, nebo je implementován nějaký IDP, který je s ním kompatibilní (Azure, Google Suite, atd...).\\
 Podařilo se nastavit Shibboleth SP pro základní přihlašování se dvěma poskytovateli identit (SAMLtest a Azure) a byly sepsány stručné návody pro základní zprovoznění SP, jeho napojení na 2 různé IDP, propojení s webovým serverem Apache2 a nastavení EDS pro využívání více IDP.
+
+%IP2 TODO rozvést, popsat edugain, eduid až odepíší
+Jako hlavní CMS byl zvolen Drupal, jelikož s Wordpresem si je velice podobný, a měl jsem s ním více zkušeností. Pro Drupal byl vybrán modul SimpleSamlPHP, který je jednoduchý na používání a má už hotový celkem kvalitní plugin, na který bude jednoduché navázat. \\
+SimpleSamlPHP bylo také zvoleno z důvodu, lepší dokumentace, více funkcí a většímu celkovému rozšíření. 
+\\
+TODO Byl proveden test propojení s univerzitami v EduGAIN, přes EduID, tento test dopadl úspěchem. 
+
 
 \label{zaver}
 
