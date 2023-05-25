@@ -2,6 +2,9 @@
 Tato práce se zabývá modely víceúrovňové autentizace. Jejím cílem je nalézt způsob pro přístup k jednomu zdroji z více univerzit za využití tamních přihlašovacích údajů.\\
 Obsahuje základní informace o různých řešeních a dále se blíže zabývá modelem SSO v podobně standardu SAML a jeho konkrétní implementací Shibboleth.\\
 Tato práce také obsahuje návody, jak zprovoznit Shibboleth SP, napojit ho na různé poskytovatele identity, což je ukázáno na Azure a SAMLtest, nastavení EDS pro využívání více IDP současně. A také využití Shibboleth SP s Apache2.\\
+\\%IP2
+V navazující IP2, bylo prozkoumáno několik CMS, a možnosti jejich možnosti SSO. K těmto prozkoumaným technologiím byly opět sepsány návody. Byla prozkoumána také další implementace SAML protokolu a to SimpleSamlPHP, včetně sepsání návodu k instalaci a nastavení a porovnání s technologií Shibboleth.
+
 
 
 \section{Terminologie}
@@ -97,13 +100,14 @@ Tyto informace SP využije k autorizaci různých svých částí.\cite{SAMLxOID
 
 \section{SimpleSamlPHP} %IP2
 
-Jedná se o aplikaci napsanou v php, která se stará o autentizaci a autorizaci pomocí SAML protokolu. Jedná se o jednu z nejrošířenějších opensource implmentací SAML protokolu.\\
+Jedná se o aplikaci napsanou v PHP, která se stará o autentizaci a autorizaci pomocí SAML protokolu. Jedná se o jednu z nejrozšířenějších opensource implementací SAML protokolu.\\
 
 Má jednoduché používání, dobrou dokumentaci a i spoustu pokročilejších funkcí.\cite{simplesamlphpdoc}
 
 \section{SimpleSamlPHP výhody oproti Shibbolethu} %IP2
 
-SimpleSAMLphp má lepší dokumentaci, je rozšířenější a tedy existuje i více informací na internetu. Jeho nastavení je jednodušší, podporuje více IDP a SP na stejné instanci. Je možné nastavit specifické nastavení (např: mapování attributů) přímo pro jednotlivá IDP.TODO: dokončit.
+SimpleSamlPHP má lepší dokumentaci, je rozšířenější a tedy existuje i více informací na internetu. Jeho nastavení je jednodušší, podporuje více IDP a SP na stejné instanci. Je možné nastavit specifické nastavení (např: mapování atributů) přímo pro jednotlivá IDP.\\ 
+Spoustu věcí, které Shibboleth dělá odděleně, nebo má nejasně či složitě zdokumentované, obsahuje SimpleSamlPHP v jednom jednoduše nastavitelném balíčku (například discovery service je funkční ihned po instalaci SimpleSamlPHP). 
 
 \chapter{Organizace a projekty} %IP2
 
@@ -114,13 +118,13 @@ Jedná se o evropský projekt, v rámci kterého spolupracuje několik univerzit
 
 \section{EduGAIN} %IP2
 
-EduGAIN je služba co se stará o propojení již existujících federací poskytovatelů identity. Toto velmi ulehčí přidávání a odebírání nových poskytovatelů identity a služeb, jelikož není pak třeba vyměnit si metadata s každým poskytovatelem identity/služeb. Do Edugain se mohou přidat pouze celé \emph{federace}. \cite{edugainWikipedie}\cite{edugain}
+EduGAIN je služba co se stará o propojení již existujících federací poskytovatelů identity. Toto velmi ulehčí přidávání a odebírání nových poskytovatelů identity a služeb, jelikož není pak třeba vyměnit si metadata s každým poskytovatelem identity/služeb. Do EduGAIN se mohou přidat pouze celé \emph{federace}. \cite{edugainWikipedie}\cite{edugain}
 EduGAIN je převážně zaměřený na výzkum a vzdělání.
 
-\section{Eduid} %IP2
+\section{EduID} %IP2
 
 Jedná se o českou akademickou federaci identit, kterou zpravuje CESNET. 
-Využívá ke své funkčnosti jako backend Shibboleth, ale je kompatabilní s jakoukoli SAML implementací, včetně simplesamlphp. Členem Shibbolethu je i CESNET.\cite{eduid}
+Využívá ke své funkčnosti jako backend Shibboleth, ale je kompatibilní s jakoukoli SAML implementací, včetně SimpleSamlPHP. Členem Shibbolethu je i CESNET.\cite{eduid}
 
 \chapter{Návody}
 \label{návod}
@@ -412,12 +416,12 @@ Zde si může uživatel jednoduše vybrat IDP, na jehož přihlašovací stránk
 \section{SimpleSamlPHP} %IP2
 V této sekci jsou veškeré návody potřebné k základnímu nastavení SimpleSamlPHP.
 \subsection{Instalace}
-Návod na instalaci SimpleSamlPHP lze nalézt na webových stránkách.\cite{SimpleSAMLphp-instalation-and-configurationduid}
+Návod na instalaci SimpleSamlPHP lze nalézt na následujících webových stránkách \cite{SimpleSAMLphp-instalation-and-configurationduid}. Jedná se o oficiální dokumentaci SimpleSAMLphp. Tento návod byl v rámci této práce otestován.
 
 \subsection{Nastavení} %IP2
 K základnímu nastavení slouží soubor config.php, který se nachází v adresáři simplesamlphp/config.
 
-K nastavení metadat, jsou soubory ve složce simplesamlphp/config/metadata. Zde se nachází soubory pro nastavení metadat pro IDP, které SP využívá, pro SAML IDP se využívá soubor saml20-idp-remote.php.
+K nastavení metadat slouží soubory ve složce simplesamlphp/config/metadata. Zde se nachází soubory pro nastavení metadat pro IDP, které SP využívá, pro SAML IDP se využívá soubor saml20-idp-remote.php.
 
 Mapování atributů lze nastavit na více místech, více v sekci \ref{attributemap_ssphp}.
 
@@ -428,12 +432,12 @@ Více informací v dokumentaci. \cite{simplesamlphpdoc}
 
 Pro přidání IDP stačí do souboru simplesamlphp/config/metadata/saml20-idp-remote.php přidat nový záznam.
 
-Získat metadata ve správném formátu lze pomocí aplikace na stránce nastavení vašeho sp vase.domena/simplesaml.
-Zde po přihlášení v záložce federation, je nástroj \emph{XML to SimpleSAMLphp metadata converter}, který po nahrání metadat převede metadata do správného formátu.
+Získat metadata ve správném formátu lze pomocí aplikace na stránce nastavení vaší instance simplesamlphp vase.domena/simplesaml.
+Zde po přihlášení v záložce federation, je nástroj \emph{XML to SimpleSamlPHP metadata converter}, který po nahrání metadat převede metadata do správného formátu.
 Více informací lze nalézt v dokumentaci.\cite{SimpleSAMLphp-Service-Provider-QuickStart}
 \\
-zde následuje příklad metadat pro vutbr.cz (některé informace byli z důvodu bezpečnosti odstraněny).
-\begin{lstlisting}[language=json]
+Zde následuje příklad metadat pro vutbr.cz (některé informace byli z důvodu bezpečnosti odstraněny).
+\begin{lstlisting}
 
     $metadata['https://app.fit.vut.cz/simplesaml/saml2/idp/'] = array (
         'entityid' => 'https://app.fit.vut.cz/simplesaml/saml2/idp/',
@@ -543,7 +547,7 @@ zde následuje příklad metadat pro vutbr.cz (některé informace byli z důvod
 \end{lstlisting}
 
 \subsubsection{Mapování a filtrování atributů}\label{attributemap_ssphp} %IP2
-Mapování attributů lze nastavit na různých místech dle potřeby.
+Mapování atributů lze nastavit na různých místech dle potřeby.
 
 \begin{itemize}
 
@@ -553,7 +557,7 @@ Mapování attributů lze nastavit na různých místech dle potřeby.
 
 \end{itemize}
 
-Jedno ze základních jednoduchých mapování je například přejmenování attributu. Toto se dělá pomocí \emph{core:AttributeMap}.
+Jedno ze základních jednoduchých mapování je například přejmenování atributu. Toto se dělá pomocí \emph{core:AttributeMap}.
 
 \begin{lstlisting}[json]
     'authproc' => [
@@ -565,7 +569,7 @@ Jedno ze základních jednoduchých mapování je například přejmenování at
     ],
 \end{lstlisting}
 
-Toto nastavení namapuje \emph{urn:oasis:names:tc:SAML:attribute:subject-id} na \emph{subject-id} a \emph{urn:oid:2.4.20} na \emph{phone}. Toto nastavení se dá dělat globálně, specificky pro SP nebo specificky pro IDP.
+Toto nastavení namapuje \emph{urn:oasis:names:tc:SAML:attribute:subject-id} na \emph{subject-id} a \emph{urn:oid:2.4.20} na \emph{phone}. Nastavení se dá dělat globálně, specificky pro SP nebo specificky pro IDP.
 
 Další možnosti filtrování jsou například
 \begin{itemize}
@@ -578,20 +582,20 @@ Mapování a filtrování atributů je dále podrobněji popsáno v dokumentaci 
 
 
 \subsubsection{Nalezení názvů atributů} %IP2
-Vyhledání názvů uvolněných atributů z IDP lze nalézt v administraci SimpleSamlPHP vase.domena/simplesaml v zalozce Authentication -> Test configured authentication sources -> Vyberte vaseho SP -> vyberte IDP od kterého chcete vyhledat uvolněné attributy. Dále se po přihlášení v idp zobrazí všechny atributy, které jsou uvolněny z IDP.
+Vyhledání názvů uvolněných atributů z IDP lze nalézt v administraci SimpleSamlPHP vase.domena/simplesaml v záložce \emph{Authentication} -> \emph{Test configured authentication sources} -> \emph{Vyberte vaseho SP} -> \emph{vyberte IDP od kterého chcete vyhledat uvolněné attributy}. Dále se po přihlášení v IDP zobrazí všechny atributy, které jsou uvolněny z IDP.
 
 
 \section{Wordpress} %IP2
 
 Wordpress je opensource CMS napsaný v PHP, který je zaměřený na jednoduchost používání a rozšířitelnost pomocí pluginů. Jedná se o jeden z nejrozšířenějších CMS. Více informací lze nalézt na webových stránkách\cite{wordpress}.
 \\
-Následují návody ke zprovoznění SSO ve Wordpresu.
+Následují návody ke zprovoznění SSO ve Wordpressu.
 
 \subsection{SSO plugin} %IP2
-Do Wordpresu byl otestován jeden plugin na napojení Shibboleth SP k Wordpresu. Jedná se o plugin Shibboleth SP\cite{ShibbolethSpWp}. Tento plugin funguje, ale obsahuje jen základní nastavení a většinu věcí přenechává samotnému Shibbolethu.
+Do Wordpressu byl otestován jeden plugin na napojení Shibboleth SP k Wordpressu. Jedná se o plugin Shibboleth SP\cite{ShibbolethSpWp}. Tento plugin funguje, ale obsahuje jen základní nastavení a většinu věcí přenechává samotnému Shibbolethu.
 
-\subsection{instalace Shibboleth modulu} %IP2
-Modul vyžaduje aby byl již nainstalován Shibboleth SP. K tomuto lze využít návod v této sekci \ref{instalaceShibboleth}. Dále je potřeba upravit \emph{.htaccess} Wordpressu, aby ignoroval url cesty /Shibboleth.sso. Tohoto lze například docílit úpravou .htacces v kořenovém adresáři Wordpressu do následující podoby.
+\subsection{Instalace Shibboleth pluginu} %IP2
+Plugin vyžaduje aby byl již nainstalován Shibboleth SP. K tomuto lze využít návod v této sekci \ref{instalaceShibboleth}. Dále je potřeba upravit \emph{.htaccess} Wordpressu, aby ignoroval url cesty \emph{/Shibboleth.sso}. Tohoto lze například docílit úpravou .htaccess v kořenovém adresáři Wordpressu do následující podoby.
 
 \begin{lstlisting}[language=php]
 
@@ -612,14 +616,14 @@ RewriteRule . /index.php [L]
 Po té stačí nainstalovat plugin a nastavit mu následující parametry.
 
 \begin{enumerate}
-    \item V záložce general
+    \item V záložce \emph{general}
     \begin{enumerate}
-        \item Nastavit login URL na vase.domena/Shibboleth.sso/Login.
-        \item Nastavit logout URL na vase.domena/Shibboleth.sso/Logout.
+        \item Nastavit \emph{login URL} na \emph{vase.domena/Shibboleth.sso/Login}.
+        \item Nastavit \emph{logout URL} na \emph{vase.domena/Shibboleth.sso/Logout}.
     \end{enumerate}
-    \item V záležce User.
+    \item V záložce \emph{User}.
      \begin{enumerate}
-        \item Nastavit mapování atributů na proměnné wordpressu, zadávají se sem parametry namapované v attribute-map.xml.
+        \item Nastavit mapování atributů na proměnné Wordpressu, zadávají se sem parametry namapované v \emph{attribute-map.xml}.
         \item Zaškrtnou přepínač \emph{Automaticly create users if they do not exist in Wordpress database} pro automatické vytvoření uživatele při prvním přihlášení přes idp.
      \end{enumerate}
 \end{enumerate}
@@ -628,15 +632,15 @@ Toto je základní nastavení pro aktivování SSO.
 
 \section{Drupal} %IP2
 
-Drupal je také opensource CMS napsaný v PHP, který je zaměřený na rozšířitelnost pomocí pluginů (Drupal je nazývá moduly). Jedná se o jedno z nejrozšířenějších CMS. Oproti Wordpresu má složitější používání.. Více informací lze nalézt na webových stránkách.\cite{drupal}
-Následují návody ke sprovoznění SSO v Drupalu.
+Drupal je také opensource CMS napsaný v PHP, který je zaměřený na rozšířitelnost pomocí pluginů (Drupal je nazývá moduly). Jedná se o jedno z nejrozšířenějších CMS. Oproti Wordpressu má složitější používání.. Více informací lze nalézt na webových stránkách.\cite{drupal}
+Následují návody ke zprovoznění SSO v Drupalu.
 
 \subsection{SSO plugin} %IP2
-Drtivá většina modulů na SSO pro Drupal využívá nějaký již nainstalovaný backend na hostitelském serveru, většinou SimpleSamlPHP a některé také Shibboleth. Dále jsou zde i komerční moduly jako například od miniOrange\cite{miniorange}, které jsou většinou již hotová řešení, kde stačí nainstalovat modul. Z důvodu lepší modularity a rozšířitelnosti bylo vybráno opensource řeššení v podobě simplesamlphp.
+Drtivá většina modulů na SSO pro Drupal využívá nějaký již nainstalovaný backend na hostitelském serveru, většinou SimpleSamlPHP a některé také Shibboleth. Dále jsou zde i komerční moduly jako například od miniOrange\cite{miniorange}, které jsou většinou již hotová řešení, kde stačí nainstalovat modul. Z důvodu lepší modularity a rozšířitelnosti bylo vybráno opensource řešení v podobě SimpleSamlPHP.
 
 \subsubsection{Shibboleth modul} %IP2
     Drupal nemá žádný dobrý Shibboleth modul, který by byl udržovaný, fungoval jednoduše hned po instalaci a měl by nějaké lepší funkce. Nejlepší modul co se povedlo nalézt je tento\cite{basicshib}. Bohužel se ale zdá že v současnosti není funkční.
-\subsubsection{SimpleSAMLphp} %IP2
+\subsubsection{SimpleSamlPHP} %IP2
     Drupal má skvělý modul pro propojení s SimpleSamlPHP, který je velmi jednoduchý na používání a má i nějaké pokročilejší funkce. Jedná se o tento plugin \cite{SimpleSAMLphpDrupal}.
 \\ 
 \\
@@ -645,7 +649,7 @@ Drtivá většina modulů na SSO pro Drupal využívá nějaký již nainstalova
         \item Instantní vytváření uživatelských účtů na základě SAML atributů (konfigurovatelné).
         \item Automatické přiřazování rolí na základě SAML atributů (konfigurovatelné).
         \item Duální mód - podpora tradičních Drupal účtů a SAML-autentizovaných účtů současně (konfigurovatelné).
-        \item  Podpora více autentizačních protokolů (díky SimpleSAMLphp)
+        \item  Podpora více autentizačních protokolů (díky SimpleSamlPHP)
         \begin{itemize}
             \item OpenID (např. Google, Yahoo)
             \item Facebook
@@ -661,7 +665,7 @@ Drtivá většina modulů na SSO pro Drupal využívá nějaký již nainstalova
     Příklady použití (převzato z \cite{SimpleSAMLphpDrupal}):
     \begin{itemize}
         \item Enterprise single sign-on --- připojte Drupalové stránky k IDP vaší organizace (stejně jako připojení Google Apps k vašemu IdP)
-        \item Single sign-on napříč Drupal stránkami na více serverech --- nastavte všechny stránky tak, aby používaly tento modul k ověřování uživatelů proti jednomu nebo více IDP. (To lze dokonce provést s více stránkami, které používají jediného poskytovatele služeb SimpleSAMLphp.)
+        \item Single sign-on napříč Drupal stránkami na více serverech --- nastavte všechny stránky tak, aby používaly tento modul k ověřování uživatelů proti jednomu nebo více IDP. (To lze dokonce provést s více stránkami, které používají jediného poskytovatele služeb SimpleSamlPHP.)
         \item Federovaná Drupal stránka --- umožněte lidem z více organizací přistupovat na stránku pomocí IdP jejich organizace.
         \item Přihlášení pomocí Facebooku/Googlu/Twitteru/atd... --- umožněte uživatelům přihlásit se na vaši stránku pomocí jejich účtu na některé z těchto služeb.
     \end{itemize}
@@ -670,20 +674,20 @@ Drtivá většina modulů na SSO pro Drupal využívá nějaký již nainstalova
 
 Modul se instaluje jako každý jiný Drupal modul. Modul je k nalezení zde \cite{SimpleSAMLphpDrupal}.
 
-SimpleSamlPHP je potřeba mít nastavené aby používalo něco jiného než phpsession jako úložiště relace. Jako úložiště relace se dá použít memcache nebo SQL.
-Toto lze nastavit v simplesamlphp/config/config.php v proměnné store.type.
+SimpleSamlPHP je potřeba mít nastavené aby používalo něco jiného než \emph{phpsession} jako úložiště relace. Jako úložiště relace se dá použít \emph{memcache} nebo \emph{SQL}.
+Toto lze nastavit v \emph{simplesamlphp/config/config.php} v proměnné \emph{store.type}.
 Nejjednodušší je nastavit memcache. Další informace lze nalézt na stránkách modulu \cite{SimpleSAMLphpDrupal}.
 
-\subsubsection{Nastavení simpleSAMLphp modulu} %IP2
+\subsubsection{Nastavení SimpleSamlPHP modulu} %IP2
 
-Pro základní spuštění stačí v nastavení modulu v drupalu nastavit následující:
+Pro základní spuštění stačí v nastavení modulu v Drupalu nastavit následující:
 
 \begin{enumerate}
-    \item v \emph{User info and syncing} nastavit atributy které se mají namapovat na atributy drupalu.
-    \item v \emph{Basic settings}
+    \item V \emph{User info and syncing} nastavit atributy které se mají namapovat na atributy Drupalu.
+    \item V \emph{Basic settings}:
     \begin{enumerate}
-        \item nastavit \emph{Authentication source for this SP} na vašeho sp.
-        \item Po dokončení nastavení můžete modul aktivovat pomocí \emph{Activate authentication via SimpleSAMLphp}
+        \item Nastavit \emph{Authentication source for this SP} na vašeho sp.
+        \item Po dokončení nastavení můžete modul aktivovat pomocí \emph{Activate authentication via SimpleSamlPHP}.
     \end{enumerate}
 
 \end{enumerate}
@@ -747,8 +751,9 @@ Touto implementací je Shibboleth, který je na řadě univerzit již implemento
 Podařilo se nastavit Shibboleth SP pro základní přihlašování se dvěma poskytovateli identit (SAMLtest a Azure) a byly sepsány stručné návody pro základní zprovoznění SP, jeho napojení na 2 různé IDP, propojení s webovým serverem Apache2 a nastavení EDS pro využívání více IDP.
 
 %IP2 TODO rozvést, popsat edugain, eduid až odepíší
-Jako hlavní CMS byl zvolen Drupal, jelikož s Wordpresem si je velice podobný, a měl jsem s ním více zkušeností. Pro Drupal byl vybrán modul SimpleSamlPHP, který je jednoduchý na používání a má už hotový celkem kvalitní plugin, na který bude jednoduché navázat. \\
-SimpleSamlPHP bylo také zvoleno z důvodu, lepší dokumentace, více funkcí a většímu celkovému rozšíření. 
+V navazující IP2 bylo prozkoumáno několik CMS, blíže byly otestovány dvě Drupal a Wordpress a byli také otestovány možnosti SSO v těchto CMS. 
+Jako hlavní CMS byl nakonec zvolen Drupal, jelikož s Wordpressem si je velice podobný, a zároveň jsem měl s ním více zkušeností. Pro Drupal byl vybrán modul SimpleSamlPHP, který je jednoduchý na používání a má už hotový kvalitní modul, na který bude jednoduché navázat. \\
+SimpleSamlPHP bylo také zvoleno z důvodu, lepší dokumentace, více funkcí a většímu celkovému rozšíření.
 \\
 TODO Byl proveden test propojení s univerzitami v EduGAIN, přes EduID, tento test dopadl úspěchem. 
 
