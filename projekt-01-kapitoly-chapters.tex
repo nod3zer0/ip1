@@ -1,9 +1,11 @@
 \chapter{Úvod}
 Tato práce se zabývá modely víceúrovňové autentizace. Jejím cílem je nalézt způsob pro přístup k jednomu zdroji z více univerzit za využití tamních přihlašovacích údajů.\\
+Tato práce je součástí rozsáhlejší projektu Digitální kampus v rámci uskupení EULiST.
+\\
 Obsahuje základní informace o různých řešeních a dále se blíže zabývá modelem SSO v podobně standardu SAML a jeho konkrétní implementací Shibboleth.\\
 Tato práce také obsahuje návody, jak zprovoznit Shibboleth SP, napojit ho na různé poskytovatele identity, což je ukázáno na Azure a SAMLtest, nastavení EDS pro využívání více IDP současně. A také využití Shibboleth SP s Apache2.\\
 \\%IP2
-V navazující IP2, bylo prozkoumáno několik CMS, a možnosti jejich možnosti SSO. K těmto prozkoumaným technologiím byly opět sepsány návody. Byla prozkoumána také další implementace SAML protokolu a to SimpleSamlPHP, včetně sepsání návodu k instalaci a nastavení a porovnání s technologií Shibboleth.
+V navazující IP2, bylo prozkoumáno několik CMS, a jejich možnosti SSO. K těmto prozkoumaným technologiím byly opět sepsány návody. Byla prozkoumána také další implementace SAML protokolu a to SimpleSamlPHP, včetně sepsání návodu k instalaci, nastavení a porovnání s technologií Shibboleth.
 
 
 
@@ -15,7 +17,7 @@ Proces pro specifikování přístupových práv ke zdrojům.\cite{Autentizace}
  \subsection{Federované identity}
 Způsob propojení identity uživatele napříč více nezávislými systémy. \cite{federatedIdentities}
 \subsection{CMS} %IP2
-Systém pro správu obsahu (CMS-Content Management System) je software zajišťující správu dokumentů, nejčastěji webového obsahu.\cite{cms}
+Systém pro správu obsahu (CMS --- Content Management System) je software zajišťující správu dokumentů, nejčastěji webového obsahu.\cite{cms}
 
 \chapter{Modely víceúrovňové autentizace}
 \section{SSO}
@@ -45,24 +47,6 @@ IDP se stará o autentizaci uživatele a následné poskytnutí dat SP.
 
 SP se stará o autorizaci uživatele ke svým zdrojům na základě informací poskytnutých od IDP.
 
-\section{OIDC}
-
-OIDC (OpenID Connect) je otevřený standard umožňující výměnu autentizačních a autorizačních dat mezi více nezávislými subjekty. Je postavený nad protokolem OAuth 2.0.\cite{OIDC}
-
-\section{OAuth 2.0.}
-Na rozdíl od OIDC OAuth 2.0. se stará pouze o autorizaci. Používá se většinou pro sdílení části dat uživatele s aplikací třetí strany bez předávání jeho přihlašovacích údajů. \\
-OIDC je potom jeho nadstavba určená přímo pro federované identity. \cite{OAUTHvSAMLvOIDC}
-
-\section{SAML versus OIDC}
-
-SAML je starší z těchto dvou protokolů a využívá k přenosu dat XML. OIDC je novější a využívá k přenosu dat JSON. 
-SAML je momentálně rozšířenější, i když OIDC nabírá na popularitě díky jednodušší implementaci a komunikaci přes JSON.\cite{SAMLxOIDC} \\
-Princip přihlašování je až na různé názvosloví podobný (Service Provider (SP) = Relying Party (RP),  Identity Provider (IDP) = OpenID Provider (OP), atd ..).
-Princip přihlašování je blíže popsán v sekci \ref{IDPlogin}.
-
-\section{Shibboleth}
-
-Shibboleth je implementace SAML standardu. Jeho hlavní součástí jsou dvě aplikace. Identity Provider (IDP), který slouží jako poskytovatel identity a stará se o autentizaci a Service Provider (SP), který slouží jako poskytovatel služeb a stará se o autorizaci po úspěšném přihlášení přes poskytovatele identity. \cite{shibbolethWiki}
 
 \subsection{Poskytovatel identity}
 
@@ -80,7 +64,7 @@ Rozlišují se dvě možnosti přihlášení. Přihlášení vyvolané na stran�
 Pokud bylo přihlášení vyvolané na straně SP, tak je uživatel přesměrován na IDP, kde bude vyzván k autentizaci.
 Po úspěšné autentizaci IDP předá informaci o úspěšné autentizaci s různými uvolněnými atributy SP společně s přesměrováním uživatele na původní stránku.
 Tyto informace SP využije k autorizaci různých svých částí uživateli.\cite{SAMLxOIDC}
-\begin{figure}[bp]
+\begin{figure}[!thbp]
 	\centering
     \includegraphics[width=1\textwidth]{obrazky-figures/saml-sp-cropped.png}
 	\caption{Ukázka přihlášení vyvolané SP\cite{SAMLxOIDC}}
@@ -90,41 +74,73 @@ Tyto informace SP využije k autorizaci různých svých částí uživateli.\ci
 Pokud bylo přihlášení vyvolané na straně IDP, tak je uživatel rovnou přesměrován na SP s informací o úspěšné autentizaci společně s různými uvolněnými atributy.
 Tyto informace SP využije k autorizaci různých svých částí.\cite{SAMLxOIDC}
 
-\begin{figure}[bp]
+\begin{figure}[!thbp]
 	\centering
     \includegraphics[width=1\textwidth]{obrazky-figures/saml-idp-cropped.png}
 	\caption{Ukázka přihlášení vyvolané IDP\cite{SAMLxOIDC}}
 	\label{saml-flow-idp}
 \end{figure}
 
+\section{OIDC}
+
+OIDC (OpenID Connect) je otevřený standard umožňující výměnu autentizačních a autorizačních dat mezi více nezávislými subjekty. Je postavený nad protokolem OAuth 2.0.\cite{OIDC}
+
+\section{OAuth 2.0.}
+Na rozdíl od OIDC OAuth 2.0. se stará pouze o autorizaci. Používá se většinou pro sdílení části dat uživatele s aplikací třetí strany bez předávání jeho přihlašovacích údajů. \\
+OIDC je potom jeho nadstavba určená přímo pro federované identity. \cite{OAUTHvSAMLvOIDC}
+
+\section{SAML versus OIDC}
+
+SAML je starší z těchto dvou protokolů a využívá k přenosu dat XML. OIDC je novější a využívá k přenosu dat JSON. 
+SAML je momentálně rozšířenější, i když OIDC nabírá na popularitě díky jednodušší implementaci a komunikaci přes JSON.\cite{SAMLxOIDC} \\
+Princip přihlašování je až na různé názvosloví podobný (Service Provider (SP) = Relying Party (RP),  Identity Provider (IDP) = OpenID Provider (OP), atd ..).
+Princip přihlašování je blíže popsán v sekci \ref{IDPlogin}.
+
+
+
+
+\section{Shibboleth}
+
+Shibboleth je implementace SAML standardu. Jeho hlavní součástí jsou dvě aplikace. Identity Provider (IDP), který slouží jako poskytovatel identity a stará se o autentizaci a Service Provider (SP), který slouží jako poskytovatel služeb a stará se o autorizaci po úspěšném přihlášení přes poskytovatele identity. \cite{shibbolethWiki}
+
+
 
 \section{SimpleSamlPHP} %IP2
 
-Jedná se o aplikaci napsanou v PHP, která se stará o autentizaci a autorizaci pomocí SAML protokolu. Jedná se o jednu z nejrozšířenějších opensource implementací SAML protokolu.\\
-
-Má jednoduché používání, dobrou dokumentaci a i spoustu pokročilejších funkcí.\cite{simplesamlphpdoc}
+Jedná se o aplikaci napsanou v PHP, která se stará o autentizaci a autorizaci pomocí SAML protokolu. Jedná se o jednu z nejrozšířenějších opensource implementací SAML protokolu. Má jednoduché používání, dobrou dokumentaci a i spoustu pokročilejších funkcí.\cite{simplesamlphpdoc}
+\\
+Na rozdíl od Shibbolethu obsahuje IDP, SP a Discovery service v jedné aplikaci.
 
 \section{SimpleSamlPHP výhody oproti Shibbolethu} %IP2
 
-SimpleSamlPHP má lepší dokumentaci, je rozšířenější a tedy existuje i více informací na internetu. Jeho nastavení je jednodušší, podporuje více IDP a SP na stejné instanci. Je možné nastavit specifické nastavení (např: mapování atributů) přímo pro jednotlivá IDP.\\ 
+SimpleSamlPHP má přímočařejší a obsáhlejší dokumentaci, která pokrývá více jeho součástí, zatímco Shibboleth má spoustu nezdokumentovaných částí a hůře se v ní orientuje. SimpleSamlPHP je také rozšířenější a tedy existuje i více informací na internetu. Jeho nastavení je jednodušší, podporuje více IDP a SP na stejné instanci. Je možné nastavit specifické nastavení (např: mapování atributů) přímo pro jednotlivá IDP.\\ 
 Spoustu věcí, které Shibboleth dělá odděleně, nebo má nejasně či složitě zdokumentované, obsahuje SimpleSamlPHP v jednom jednoduše nastavitelném balíčku (například discovery service je funkční ihned po instalaci SimpleSamlPHP). 
 
 \chapter{Organizace a projekty} %IP2
 
-Zde jsou organizace a projekty, do kterých je již velká část univerzit zapojená, které se starají o autentizaci a dají se tedy využít v rámci projektu.
+Zde jsou organizace a projekty, do kterých je již velká část univerzit zapojená, které se starají o autentizaci a dají se tedy využít v rámci této práce.
 
 \section{EULiST} %IP2
 Jedná se o evropský projekt, v rámci kterého spolupracuje několik univerzit napříč Evropou a tvoří tak univerzitní alianci. Do této aliance v době psaní této práce patří Slovenská technická univerzita v Bratislave, Vysoké učení tehchnické v Brně,  Leibniz Universität Hannover, LUT University, Jönköping University, Rey Juan Carlos University, Technische Universität Wien, University of L’Aquila a Institut Mines-Télécom.\cite{eulist}
+\\
+Pro tuto organizaci vznikl projekt Digitální kampus, pro něhož je třeba zřídit přihlašování pomocí SSO, kterým se zabývá tato práce.
+
+\subsection{Digitální kampus}
+
+Jedná se o budoucí digitální infrastrukturu v rámci projektu EULiST pro vzdělání a výzkum, který bude mít za cíl usnadnit spolupráci mezi administrativními a akademickými pracovníky, studenty a širší komunitou EULiST.\cite{digitalcampus}
 
 \section{EduGAIN} %IP2
 
-EduGAIN je služba co se stará o propojení již existujících federací poskytovatelů identity. Toto velmi ulehčí přidávání a odebírání nových poskytovatelů identity a služeb, jelikož není pak třeba vyměnit si metadata s každým poskytovatelem identity/služeb. Do EduGAIN se mohou přidat pouze celé \emph{federace}. \cite{edugainWikipedie}\cite{edugain}
+EduGAIN je služba co se stará o propojení již existujících federací poskytovatelů identity. Toto velmi ulehčí přidávání a odebírání nových poskytovatelů identity a služeb, jelikož není pak třeba vyměnit si metadata s každým poskytovatelem identity/služeb. \\Do EduGAIN se mohou přidat pouze celé \emph{federace}. \cite{edugainWikipedie}\cite{edugain}\\
 EduGAIN je převážně zaměřený na výzkum a vzdělání.
+Do této služby je již velká část univerzit z projektu EULiST zapojena.
 
 \section{EduID} %IP2
 
 Jedná se o českou akademickou federaci identit, kterou zpravuje CESNET. 
 Využívá ke své funkčnosti jako backend Shibboleth, ale je kompatibilní s jakoukoli SAML implementací, včetně SimpleSamlPHP. Členem Shibbolethu je i CESNET.\cite{eduid}
+\\
+Této federace využívá VUT, pro přístup do EduGAIN.
 
 \chapter{Návody}
 \label{návod}
@@ -198,7 +214,7 @@ sudo service shibd restart
 Pokud je vše nastaveno správně, tak na následující adrese bude text: "A valid session was not found."\\
 \url{https://vasedomena/Shibboleth.sso/Session}
 
-\section{Propojení Shibboleth s idp}
+\section{Propojení Shibboleth s IDP}
 
 Zde je uvedeno pár návodů pro propojení SP s různými IDP.
 
@@ -416,7 +432,7 @@ Zde si může uživatel jednoduše vybrat IDP, na jehož přihlašovací stránk
 \section{SimpleSamlPHP} %IP2
 V této sekci jsou veškeré návody potřebné k základnímu nastavení SimpleSamlPHP.
 \subsection{Instalace}
-Návod na instalaci SimpleSamlPHP lze nalézt na následujících webových stránkách \cite{SimpleSAMLphp-instalation-and-configurationduid}. Jedná se o oficiální dokumentaci SimpleSAMLphp. Tento návod byl v rámci této práce otestován.
+Návod na instalaci SimpleSamlPHP je k nalezení na následujících webových stránkách \cite{SimpleSAMLphp-instalation-and-configurationduid}. Jedná se o oficiální dokumentaci SimpleSAMLphp. Tento návod byl v rámci této práce otestován, a nebylo potřeba ho nějak aktualizovat.
 
 \subsection{Nastavení} %IP2
 K základnímu nastavení slouží soubor config.php, který se nachází v adresáři simplesamlphp/config.
@@ -425,16 +441,16 @@ K nastavení metadat slouží soubory ve složce simplesamlphp/config/metadata. 
 
 Mapování atributů lze nastavit na více místech, více v sekci \ref{attributemap_ssphp}.
 
-Pro nastavení kromě config souborů existuje i administrační stránka, která je dostupná na adrese vase.domena/simplesaml. Zde je možné nastavit některé parametry, které jsou v config souborech, ale drtivou většinu nastavení je potřeba upravovat přes config soubory.
+Pro nastavení kromě config souborů existuje i administrační stránka, která je dostupná na adrese vase.domena/simplesaml. Zde je možné nastavit některé parametry, které jsou v config souborech, ale většinu nastavení je potřeba upravovat přes config soubory.
 Více informací v dokumentaci. \cite{simplesamlphpdoc}
 
 \subsubsection{Přidávání nových IDP} %IP2
 
 Pro přidání IDP stačí do souboru simplesamlphp/config/metadata/saml20-idp-remote.php přidat nový záznam.
 
-Získat metadata ve správném formátu lze pomocí aplikace na stránce nastavení vaší instance simplesamlphp vase.domena/simplesaml.
-Zde po přihlášení v záložce federation, je nástroj \emph{XML to SimpleSamlPHP metadata converter}, který po nahrání metadat převede metadata do správného formátu.
-Více informací lze nalézt v dokumentaci.\cite{SimpleSAMLphp-Service-Provider-QuickStart}
+Získat metadata ve správném formátu lze pomocí aplikace na stránce nastavení vaší instance SimpleSamlPHP vase.domena/simplesaml.
+Zde po přihlášení v záložce \emph{federation}, je nástroj \emph{XML to SimpleSamlPHP metadata converter}, který po nahrání metadat převede metadata do správného formátu.
+Více informací je k nalezení v dokumentaci.\cite{SimpleSAMLphp-Service-Provider-QuickStart}
 \\
 Zde následuje příklad metadat pro vutbr.cz (některé informace byli z důvodu bezpečnosti odstraněny).
 \begin{lstlisting}
@@ -477,7 +493,7 @@ Zde následuje příklad metadat pro vutbr.cz (některé informace byli z důvod
           array (
             'contactType' => 'support',
             'company' => 'CVT FIT VUT',
-            'givenName' => 'Jméno',
+            'givenName' => 'Jmeno',
             'surName' => 'Prijmeni',
             'emailAddress' =>
             array (
@@ -587,7 +603,7 @@ Vyhledání názvů uvolněných atributů z IDP lze nalézt v administraci Simp
 
 \section{Wordpress} %IP2
 
-Wordpress je opensource CMS napsaný v PHP, který je zaměřený na jednoduchost používání a rozšířitelnost pomocí pluginů. Jedná se o jeden z nejrozšířenějších CMS. Více informací lze nalézt na webových stránkách\cite{wordpress}.
+Wordpress je opensource CMS napsaný v PHP, který je zaměřený na jednoduchost používání a rozšířitelnost pomocí pluginů. Jedná se o jeden z nejrozšířenějších CMS. Více informací je k nalezení na webových stránkách\cite{wordpress}.
 \\
 Následují návody ke zprovoznění SSO ve Wordpressu.
 
@@ -595,11 +611,11 @@ Následují návody ke zprovoznění SSO ve Wordpressu.
 Do Wordpressu byl otestován jeden plugin na napojení Shibboleth SP k Wordpressu. Jedná se o plugin Shibboleth SP\cite{ShibbolethSpWp}. Tento plugin funguje, ale obsahuje jen základní nastavení a většinu věcí přenechává samotnému Shibbolethu.
 
 \subsection{Instalace Shibboleth pluginu} %IP2
-Plugin vyžaduje aby byl již nainstalován Shibboleth SP. K tomuto lze využít návod v této sekci \ref{instalaceShibboleth}. Dále je potřeba upravit \emph{.htaccess} Wordpressu, aby ignoroval url cesty \emph{/Shibboleth.sso}. Tohoto lze například docílit úpravou .htaccess v kořenovém adresáři Wordpressu do následující podoby.
+Plugin vyžaduje aby byl již nainstalován Shibboleth SP. K tomuto lze využít návod v této sekci \ref{instalaceShibboleth}. Dále je potřeba upravit \emph{.htaccess} Wordpressu, aby ignoroval url cesty \emph{/Shibboleth.sso}. Tohoto lze například docílit úpravou \emph{.htaccess} v kořenovém adresáři Wordpressu do následující podoby.
 
 \begin{lstlisting}[language=php]
 
-    <IfModule mod_rewrite.c>
+<IfModule mod_rewrite.c>
 RewriteEngine On
 RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
 RewriteBase /
@@ -632,7 +648,9 @@ Toto je základní nastavení pro aktivování SSO.
 
 \section{Drupal} %IP2
 
-Drupal je také opensource CMS napsaný v PHP, který je zaměřený na rozšířitelnost pomocí pluginů (Drupal je nazývá moduly). Jedná se o jedno z nejrozšířenějších CMS. Oproti Wordpressu má složitější používání.. Více informací lze nalézt na webových stránkách.\cite{drupal}
+Drupal je také opensource CMS napsaný v PHP, který je zaměřený na rozšířitelnost pomocí pluginů (Drupal je nazývá moduly). Je to jeden z nejrozšířenějších CMS. Oproti Wordpressu má o trochu strmější učící křivku, jelikož je spíše zaměřen na vývojáře, zatímco Wordpress je více přátelský pro začátečníky a neprogramátory. \cite{drupalvswordpress} 
+Více informací lze nalézt na webových stránkách.\cite{drupal}
+\\
 Následují návody ke zprovoznění SSO v Drupalu.
 
 \subsection{SSO plugin} %IP2
@@ -641,7 +659,7 @@ Drtivá většina modulů na SSO pro Drupal využívá nějaký již nainstalova
 \subsubsection{Shibboleth modul} %IP2
     Drupal nemá žádný dobrý Shibboleth modul, který by byl udržovaný, fungoval jednoduše hned po instalaci a měl by nějaké lepší funkce. Nejlepší modul co se povedlo nalézt je tento\cite{basicshib}. Bohužel se ale zdá že v současnosti není funkční.
 \subsubsection{SimpleSamlPHP} %IP2
-    Drupal má skvělý modul pro propojení s SimpleSamlPHP, který je velmi jednoduchý na používání a má i nějaké pokročilejší funkce. Jedná se o tento plugin \cite{SimpleSAMLphpDrupal}.
+    Drupal má skvělý modul pro propojení se SimpleSamlPHP, který je velmi jednoduchý na používání a má i nějaké pokročilejší funkce. Jedná se o tento plugin \cite{SimpleSAMLphpDrupal}.
 \\ 
 \\
      Podporované funkce v době psaní této práce (převzato z \cite{SimpleSAMLphpDrupal}):
@@ -664,7 +682,7 @@ Drtivá většina modulů na SSO pro Drupal využívá nějaký již nainstalova
     \\
     Příklady použití (převzato z \cite{SimpleSAMLphpDrupal}):
     \begin{itemize}
-        \item Enterprise single sign-on --- připojte Drupalové stránky k IDP vaší organizace (stejně jako připojení Google Apps k vašemu IdP)
+        \item Enterprise single sign-on --- připojte Drupal stránky k IDP vaší organizace (stejně jako připojení Google Apps k vašemu IdP)
         \item Single sign-on napříč Drupal stránkami na více serverech --- nastavte všechny stránky tak, aby používaly tento modul k ověřování uživatelů proti jednomu nebo více IDP. (To lze dokonce provést s více stránkami, které používají jediného poskytovatele služeb SimpleSamlPHP.)
         \item Federovaná Drupal stránka --- umožněte lidem z více organizací přistupovat na stránku pomocí IdP jejich organizace.
         \item Přihlášení pomocí Facebooku/Googlu/Twitteru/atd... --- umožněte uživatelům přihlásit se na vaši stránku pomocí jejich účtu na některé z těchto služeb.
@@ -691,6 +709,45 @@ Pro základní spuštění stačí v nastavení modulu v Drupalu nastavit násle
     \end{enumerate}
 
 \end{enumerate}
+
+\chapter{Plán pluginu}
+
+Zde jsou možnosti co by se dalo rozšířit na SimpleSamlPHP při integraci do digitálního kampusu.
+
+\section{možná rozšíření}
+
+\begin{itemize}
+    \item Přidat možnost přidávat/editovat/odebírat IDP přes gui (buď v Drupal modulu nebo v SimpleSamlPHP administraci).
+    \item Automatické plnění jakýchkoli Drupal atributů.
+    \item Export/import kompletního nastavení jak modulu tak SimpleSamlPHP.
+    \item Možnost deaktivovat aktualizaci atributů pro jednotlivé uživatele.
+\end{itemize}
+
+\subsection{Automatické plnění jakýchkoli Drupal atributů}
+K tomuto lze využít například tento plugin, je funkční hned po instalaci. \cite{SimpleSAMLphpDrupalAttr}
+
+\subsection{Přidávání/odebírání/deaktivace/nastavení IDP přes gui}
+Možnost upravovat IDP přímo z modulu/administrace SimpleSamlPHP bez nutnosti editovat config soubory. 
+Pomocí jednoduchého menu by bylo možné přidat IDP. Následně nastavit url/nahrát jeho metadata.
+Zde by mohlo být i možné nastavit přemapování přijatých atributů od konkrétního IDP na standardizované atributy v rámci Drupalu.
+
+\subsection{Mazání již neexistujících uživatelů }
+Pro tuto funkcionalitu bude třeba otestovat jestli IDP daných univerzit podporují nějaký způsob dotázání se jestli daný uživatel existuje v jejich IDP, jelikož tuto vlastnost SAML nespecifikuje.\\
+
+\subsection{Možnost deaktivovat aktualizaci atributů pro jednotlivé uživatele}
+Mohou existovat výjimky, kde bude třeba nastavit data ručně, z tohoto důvodu se může hodit možnost deaktivovat automatické nahrávání atributů pro jednotlivé uživatele.
+
+\section{Usecase diagram}
+
+K samotnému pluginu bude mít přístup pouze administrátor/technický pracovník.
+
+\\ \\
+
+\includegraphics[scale=0.8]{obrazky-figures/usecase-diagram.png}
+
+
+
+    
 
 
 
@@ -750,12 +807,13 @@ Z používaných technologií byl zvolen SAML, protože již existovala jeho imp
 Touto implementací je Shibboleth, který je na řadě univerzit již implementován, nebo je implementován nějaký IDP, který je s ním kompatibilní (Azure, Google Suite, atd...).\\
 Podařilo se nastavit Shibboleth SP pro základní přihlašování se dvěma poskytovateli identit (SAMLtest a Azure) a byly sepsány stručné návody pro základní zprovoznění SP, jeho napojení na 2 různé IDP, propojení s webovým serverem Apache2 a nastavení EDS pro využívání více IDP.
 
-%IP2 TODO rozvést, popsat edugain, eduid až odepíší
-V navazující IP2 bylo prozkoumáno několik CMS, blíže byly otestovány dvě Drupal a Wordpress a byli také otestovány možnosti SSO v těchto CMS. 
-Jako hlavní CMS byl nakonec zvolen Drupal, jelikož s Wordpressem si je velice podobný, a zároveň jsem měl s ním více zkušeností. Pro Drupal byl vybrán modul SimpleSamlPHP, který je jednoduchý na používání a má už hotový kvalitní modul, na který bude jednoduché navázat. \\
+%IP2 
+V navazující IP2 bylo prozkoumáno několik CMS, blíže byly otestovány dva Drupal a Wordpress a byli také otestovány možnosti SSO v těchto CMS. 
+Jako hlavní CMS byl nakonec zvolen Drupal, jelikož s Wordpressem si je velice podobný, a zároveň jsem měl s ním více zkušeností. Pro Drupal byl vybrán modul SimpleSamlPHP, který je jednoduchý na používání a má už hotový kvalitní modul, na který bude jednoduché navázat. 
+\\
 SimpleSamlPHP bylo také zvoleno z důvodu, lepší dokumentace, více funkcí a většímu celkovému rozšíření.
 \\
-TODO Byl proveden test propojení s univerzitami v EduGAIN, přes EduID, tento test dopadl úspěchem. 
+Taky byl přidán popis organizací EduGAIN a EduID, které budou v rámci navazujícího projektu využívány.
 
 
 \label{zaver}
